@@ -14,9 +14,15 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        bg: { primary: '#07080d', secondary: '#0c0d14', card: '#10111a', hover: '#14151f', border: '#1a1b27' },
-        accent: { red: '#c0392b', redLight: '#e74c3c', redGlow: 'rgba(192,57,43,0.15)' },
-        txt: { primary: '#e8e8ec', secondary: '#8b8b9e', muted: '#55556a' }
+        bg: { primary: '#050505', secondary: '#0a0a0a', card: '#0f0f0f', hover: '#151515', border: '#1c1c1c' },
+        accent: { 
+          primary: '#10b981', 
+          primaryLight: '#34d399', 
+          primaryGlow: 'rgba(16, 185, 129, 0.15)',
+          gold: '#f59e0b',
+          red: '#ef4444'
+        },
+        txt: { primary: '#ffffff', secondary: '#a0a0a0', muted: '#505050' }
       }
     }
   }
@@ -27,12 +33,12 @@ tailwind.config = {
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', -apple-system, sans-serif;
-  background: radial-gradient(circle at 10% 20%, rgba(192, 57, 43, 0.08), transparent 45%),
-              radial-gradient(circle at 90% 80%, rgba(41, 128, 185, 0.06), transparent 45%),
-              radial-gradient(circle at 50% 50%, rgba(20, 21, 31, 0.5), transparent 60%),
-              #07080d;
+  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.05), transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.04), transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0.5), transparent 60%),
+              #050505;
   background-attachment: fixed;
-  color: #e8e8ec;
+  color: #ffffff;
   min-height: 100vh;
   display: flex;
 }
@@ -80,7 +86,7 @@ body {
   transform: translateY(-50%);
   width: 3px;
   height: 20px;
-  background: #c0392b;
+  background: #10b981;
   border-radius: 0 3px 3px 0;
 }
 .sidebar-label {
@@ -96,18 +102,18 @@ body {
 
 /* Cards */
 .card {
-  background: rgba(16, 17, 26, 0.5);
+  background: rgba(15, 15, 15, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 .card:hover { 
-  border-color: rgba(255, 255, 255, 0.08); 
-  background: rgba(16, 17, 26, 0.65);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-color: rgba(16, 185, 129, 0.2); 
+  background: rgba(20, 20, 20, 0.7);
+  box-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.05);
 }
 .card-flat {
   background: transparent;
@@ -124,7 +130,7 @@ body {
 .port-card:hover:not(.active) {
   transform: translateY(-2px);
   border-color: #252638;
-  box-shadow: 0 10px 25px -5px rgba(192, 57, 43, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);
 }
 .port-card::before {
   content: '';
@@ -132,19 +138,19 @@ body {
   top: 0; left: 0; right: 0;
   height: 2px;
   background: transparent;
-  border-radius: 14px 14px 0 0;
+  border-radius: 12px 12px 0 0;
   transition: background 0.25s ease;
 }
-.port-card.active::before { background: #c0392b; }
-.port-card.active { border-color: #2a1a1a; background: #110e12; }
+.port-card.active::before { background: #10b981; }
+.port-card.active { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.03); }
 
 /* Red dot accent */
-.dot-red {
+.dot-emerald {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #c0392b;
-  box-shadow: 0 0 12px rgba(192,57,43,0.4);
+  background: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
   flex-shrink: 0;
 }
 
@@ -163,7 +169,7 @@ body {
   top: 8px;
   bottom: 8px;
   width: 1px;
-  background: linear-gradient(180deg, #c0392b 0%, #2a1a27 100%);
+  background: linear-gradient(180deg, #10b981 0%, #050505 100%);
 }
 .chain-step {
   position: relative;
@@ -178,11 +184,11 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  border: 1.5px solid #c0392b;
-  background: #07080d;
+  border: 1.5px solid #10b981;
+  background: #050505;
 }
-.chain-step:first-child::before { background: #c0392b; }
-.chain-step:last-child::before { background: #c0392b; }
+.chain-step:first-child::before { background: #10b981; }
+.chain-step:last-child::before { background: #10b981; }
 
 @keyframes chainIn {
   from { opacity: 0; transform: translateX(-12px); }
@@ -209,9 +215,9 @@ body {
 }
 
 /* Markdown Prose Customization */
-.prose ul > li::marker { color: #c0392b; }
-.prose blockquote { border-left-color: #c0392b; color: #8b8b9e; font-style: italic; background: rgba(192,57,43,0.05); padding: 4px 12px; border-radius: 0 4px 4px 0; }
-.prose strong { color: #e8e8ec; font-weight: 600; }
+.prose ul > li::marker { color: #10b981; }
+.prose blockquote { border-left-color: #10b981; color: #a0a0a0; font-style: italic; background: rgba(16, 185, 129, 0.05); padding: 4px 12px; border-radius: 0 4px 4px 0; }
+.prose strong { color: #ffffff; font-weight: 600; }
 .prose p { margin-bottom: 0.75em; }
 
 /* Score arc */
@@ -262,7 +268,7 @@ body {
 .loader {
   width: 28px; height: 28px;
   border: 2px solid #1a1b27;
-  border-top-color: #c0392b;
+  border-top-color: #10b981;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -274,8 +280,8 @@ body {
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="mb-8">
-    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
-      <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 flex items-center justify-center">
+      <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
     </div>
   </div>
 
@@ -310,17 +316,17 @@ body {
 <!-- About Modal -->
 <div id="about-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
   <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleAbout()"></div>
-  <div class="relative card p-8 max-w-xl w-full mx-4 border-t-2 border-t-accent-red" style="animation: fadeIn 0.3s ease-out">
+  <div class="relative card p-8 max-w-xl w-full mx-4 border-t-2 border-t-accent-primary" style="animation: fadeIn 0.3s ease-out">
     <button onclick="toggleAbout()" class="absolute top-4 right-4 text-txt-muted hover:text-txt-primary transition-colors">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
 
     <div class="flex items-center gap-3 mb-6">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
-        <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
       </div>
       <div>
-        <h2 class="text-lg font-bold">AlphaReason<span class="text-accent-red">AI</span></h2>
+        <h2 class="text-lg font-bold">AlphaReason<span class="text-accent-primary">AI</span></h2>
         <p class="text-[11px] text-txt-muted tracking-widest uppercase">Autonomous Reasoning Engine</p>
       </div>
     </div>
@@ -356,19 +362,19 @@ body {
       <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Capabilities</span>
       <div class="mt-2 space-y-2">
         <div class="flex items-start gap-2">
-          <div class="dot-red mt-1.5"></div>
+          <div class="dot-emerald mt-1.5"></div>
           <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Causal Linking</strong> — Traces News &rarr; Sector &rarr; Stock &rarr; Portfolio impact with confidence scores</p>
         </div>
         <div class="flex items-start gap-2">
-          <div class="dot-red mt-1.5"></div>
+          <div class="dot-emerald mt-1.5"></div>
           <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Conflict Resolution</strong> — Detects when price contradicts news sentiment and explains why</p>
         </div>
         <div class="flex items-start gap-2">
-          <div class="dot-red mt-1.5"></div>
+          <div class="dot-emerald mt-1.5"></div>
           <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Risk Detection</strong> — Flags concentration risk, single-stock exposure, rate sensitivity</p>
         </div>
         <div class="flex items-start gap-2">
-          <div class="dot-red mt-1.5"></div>
+          <div class="dot-emerald mt-1.5"></div>
           <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Self-Evaluation</strong> — Grades its own reasoning on 6 dimensions (A/B/C/D/F)</p>
         </div>
       </div>
@@ -390,7 +396,7 @@ body {
   <!-- Header -->
   <header class="px-8 py-6 border-b border-bg-border flex items-center justify-between sticky top-0 z-40 bg-bg-primary/70 backdrop-blur-md">
     <div>
-      <h1 class="text-xl font-bold tracking-tight">AlphaReason <span class="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">AI</span></h1>
+      <h1 class="text-xl font-bold tracking-tight">AlphaReason <span class="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">AI</span></h1>
       <p class="text-[11px] text-txt-muted tracking-widest uppercase mt-0.5">Autonomous Reasoning Engine</p>
     </div>
     <div class="flex items-center gap-5">
@@ -404,7 +410,7 @@ body {
         <span class="text-xs text-txt-secondary">Live</span>
       </div>
       <span class="mono text-sm text-txt-secondary">April 21, 2026</span>
-      <div id="market-badge" class="badge-sm bg-red-500/10 text-red-400">BEARISH</div>
+      <div id="market-badge" class="badge-sm bg-accent-primaryGlow text-accent-primary">BULLISH</div>
     </div>
   </header>
 
@@ -418,7 +424,7 @@ body {
     <!-- Portfolio Selector -->
     <div class="mb-2">
       <div class="flex items-center gap-2 mb-4">
-        <div class="dot-red"></div>
+        <div class="dot-emerald"></div>
         <h2 class="text-sm font-semibold tracking-wide">Select Portfolio</h2>
       </div>
     </div>
@@ -441,39 +447,39 @@ body {
       </div>
       <div class="port-card card p-5 anim" style="animation-delay:0.05s" data-id="PORTFOLIO_002" onclick="selectPortfolio('PORTFOLIO_002', this)">
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 text-sm font-bold">P</div>
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">P</div>
           <div class="flex-1">
             <h3 class="text-sm font-semibold" id="p2-name">-</h3>
             <p class="text-[11px] text-txt-muted" id="p2-desc"></p>
           </div>
-          <span class="badge-sm bg-red-500/10 text-red-400">Concentrated</span>
+          <span class="badge-sm bg-emerald-500/10 text-emerald-400">Concentrated</span>
         </div>
         <div class="divider mb-3"></div>
         <div class="flex justify-between">
           <div><span class="text-[10px] text-txt-muted uppercase">Value</span><p class="mono text-sm font-semibold" id="p2-value"></p></div>
-          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-red-400" id="p2-risk"></p></div>
+          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-emerald-400" id="p2-risk"></p></div>
         </div>
       </div>
       <div class="port-card card p-5 anim" style="animation-delay:0.1s" data-id="PORTFOLIO_003" onclick="selectPortfolio('PORTFOLIO_003', this)">
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 text-sm font-bold">A</div>
+          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">A</div>
           <div class="flex-1">
             <h3 class="text-sm font-semibold" id="p3-name">-</h3>
             <p class="text-[11px] text-txt-muted" id="p3-desc"></p>
           </div>
-          <span class="badge-sm bg-blue-500/10 text-blue-400">Conservative</span>
+          <span class="badge-sm bg-emerald-500/10 text-emerald-400">Conservative</span>
         </div>
         <div class="divider mb-3"></div>
         <div class="flex justify-between">
           <div><span class="text-[10px] text-txt-muted uppercase">Value</span><p class="mono text-sm font-semibold" id="p3-value"></p></div>
-          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-blue-400" id="p3-risk"></p></div>
+          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-emerald-400" id="p3-risk"></p></div>
         </div>
       </div>
     </div>
 
     <!-- Agent Thinking -->
     <div id="agent-thinking" class="hidden mb-6">
-      <div class="card p-6 border-accent-redGlow border shadow-[0_0_15px_rgba(192,57,43,0.15)]">
+      <div class="card p-6 border-accent-primaryGlow border shadow-[0_0_15px_rgba(16,185,129,0.15)]">
         <div class="flex items-center gap-3 mb-5">
           <div class="loader"></div>
           <div>
@@ -495,11 +501,11 @@ body {
     <div id="main-content" class="hidden">
 
       <!-- Narrative Briefing -->
-      <div class="card p-6 mb-5 anim anim-1 border-l-2 border-l-accent-red">
+      <div class="card p-6 mb-5 anim anim-1 border-l-2 border-l-accent-primary">
         <div class="flex items-center gap-2 mb-4">
-          <div class="dot-red"></div>
+          <div class="dot-emerald"></div>
           <span class="text-[10px] text-txt-muted uppercase tracking-widest">Advisor Briefing</span>
-          <span class="badge-sm bg-accent-redGlow text-accent-red ml-auto">Autonomous</span>
+          <span class="badge-sm bg-accent-primaryGlow text-accent-primary ml-auto">Autonomous</span>
         </div>
         <div id="narrative" class="prose prose-invert prose-sm max-w-none text-txt-secondary leading-[1.8] space-y-3"></div>
       </div>
@@ -531,7 +537,7 @@ body {
 
         <div class="col-span-5 card p-6 anim" style="animation-delay:0.1s">
           <div class="flex items-center gap-2 mb-3">
-            <div class="dot-red"></div>
+            <div class="dot-emerald"></div>
             <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Insight</span>
           </div>
           <p id="key-takeaway" class="text-[13px] leading-relaxed text-txt-secondary"></p>
@@ -540,7 +546,7 @@ body {
 
       <!-- Section: Analysis -->
       <div id="section-analysis" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Analysis</span></div>
+        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Analysis</span></div>
       </div>
       <div class="grid grid-cols-12 gap-5 mb-5">
         <div class="col-span-5 card p-6 anim" style="animation-delay:0.15s">
@@ -559,7 +565,7 @@ body {
 
       <!-- Section: Reasoning -->
       <div id="section-reasoning" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Reasoning &amp; Risk</span></div>
+        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Reasoning &amp; Risk</span></div>
       </div>
       <div class="grid grid-cols-12 gap-5 mb-5">
         <div class="col-span-4 card p-6 anim" style="animation-delay:0.25s">
@@ -588,7 +594,7 @@ body {
 
       <!-- Section: Trace -->
       <div id="section-trace" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Trace &amp; Observability</span></div>
+        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Trace &amp; Observability</span></div>
       </div>
       <div class="grid grid-cols-12 gap-5 mb-8">
         <div class="col-span-7 card p-6 anim" style="animation-delay:0.4s">
@@ -711,7 +717,7 @@ async function loadPortfolio(id) {
   const grade = data.evaluation.grade;
   const finalDiv = document.createElement('div');
   finalDiv.className = 'flex items-center gap-3 py-2 mt-2 border-t border-bg-border';
-  finalDiv.innerHTML = '<div class="dot-red"></div><span class="text-sm font-semibold">Analysis complete — Grade ' + grade + ' (' + Math.round(data.evaluation.overall_score * 100) + '%)</span>';
+  finalDiv.innerHTML = '<div class="dot-emerald"></div><span class="text-sm font-semibold">Analysis complete — Grade ' + grade + ' (' + Math.round(data.evaluation.overall_score * 100) + '%)</span>';
   stepsEl.appendChild(finalDiv);
 
   await new Promise(r => setTimeout(r, 600));
@@ -730,13 +736,13 @@ function renderBriefing(data) {
   const isLoss = b.portfolio_pnl.includes('Rs-') || b.portfolio_pnl.includes('Rs -');
   const pnlEl = document.getElementById('pnl-value');
   pnlEl.textContent = (isLoss ? '-' : '') + '\u20B9' + fmt(Math.abs(pnlNum));
-  pnlEl.className = 'text-3xl font-bold mono mt-2 mb-1 ' + (isLoss ? 'text-red-400' : 'text-emerald-400');
+  pnlEl.className = 'text-3xl font-bold mono mt-2 mb-1 ' + (isLoss ? 'text-accent-red' : 'text-accent-primary');
 
   const pctMatch = b.portfolio_pnl.match(/([-+]?\d+\.\d+)%/);
   const pct = pctMatch ? parseFloat(pctMatch[1]) : 0;
   const pctEl = document.getElementById('pnl-pct');
   pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% today';
-  pctEl.className = 'text-base font-semibold mono mb-4 ' + (pct < 0 ? 'text-red-400' : 'text-emerald-400');
+  pctEl.className = 'text-base font-semibold mono mb-4 ' + (pct < 0 ? 'text-accent-red' : 'text-accent-primary');
 
   const tvMatch = b.portfolio_pnl.match(/Total value: Rs([\d,]+)/);
   document.getElementById('total-value').textContent = tvMatch ? '\u20B9' + tvMatch[1] : '';
@@ -748,7 +754,7 @@ function renderBriefing(data) {
   document.getElementById('score-pct').textContent = Math.round(score * 100) + '%';
   const circ = document.getElementById('score-circle');
   circ.style.strokeDashoffset = 283 * (1 - score);
-  const gc = {A:'#22c55e',B:'#3b82f6',C:'#f59e0b',D:'#ef4444',F:'#ef4444'};
+  const gc = {A:'#10b981',B:'#34d399',C:'#f59e0b',D:'#ef4444',F:'#ef4444'};
   circ.style.stroke = gc[grade] || '#c0392b';
   document.getElementById('score-grade').style.color = gc[grade] || '#c0392b';
 
@@ -820,7 +826,7 @@ function showChain(idx) {
       chain.chain.map((step, i) =>
         '<div class="chain-step" style="animation-delay:' + (i * 0.08) + 's"><div class="text-[13px] ' + (i === 0 ? 'text-txt-primary font-medium' : 'text-txt-secondary') + '">' + step + '</div></div>'
       ).join('') +
-      '<div class="chain-step" style="animation-delay:' + (chain.chain.length * 0.08) + 's"><div class="text-[13px] font-semibold text-accent-red">' + chain.impact + '</div></div>' +
+      '<div class="chain-step" style="animation-delay:' + (chain.chain.length * 0.08) + 's"><div class="text-[13px] font-semibold text-accent-primary">' + chain.impact + '</div></div>' +
     '</div>' +
     '<div class="mt-3 flex flex-wrap gap-1.5">' +
       chain.affected.map(s => '<span class="px-2 py-0.5 rounded-md bg-bg-hover border border-bg-border text-[10px] text-txt-secondary font-medium">' + s + '</span>').join('') +
@@ -848,18 +854,18 @@ function renderRisks(risks) {
   noEl.classList.add('hidden');
   list.innerHTML = risks.map(r => {
     const crit = r.toLowerCase().includes('concentration') || r.toLowerCase().includes('single stock');
-    return '<div class="p-3 rounded-lg border-l-2 ' + (crit ? 'border-l-red-500 bg-red-500/5' : 'border-l-amber-500 bg-amber-500/5') + '">' +
+    return '<div class="p-3 rounded-lg border-l-2 ' + (crit ? 'border-l-accent-red bg-accent-red/5' : 'border-l-accent-gold bg-accent-gold/5') + '">' +
       '<p class="text-[11px] font-medium">' + r + '</p></div>';
   }).join('');
 }
 
 function renderEvalBars(dims) {
   const el = document.getElementById('eval-bars');
-  const colors = {causal_depth:'bg-accent-red',coverage:'bg-emerald-500',conflict_handling:'bg-amber-500',risk_identification:'bg-red-500',confidence_calibration:'bg-purple-500',conciseness:'bg-blue-500'};
+  const colors = {causal_depth:'bg-accent-primary',coverage:'bg-accent-primary',conflict_handling:'bg-accent-gold',risk_identification:'bg-accent-red',confidence_calibration:'bg-accent-gold',conciseness:'bg-accent-primary'};
   const labels = {causal_depth:'Causal Depth',coverage:'Coverage',conflict_handling:'Conflicts',risk_identification:'Risk Detection',confidence_calibration:'Calibration',conciseness:'Conciseness'};
   el.innerHTML = dims.map(d =>
     '<div><div class="flex justify-between mb-1"><span class="text-[10px] text-txt-muted">' + (labels[d.name]||d.name) + '</span><span class="mono text-[10px] font-semibold">' + Math.round(d.score*100) + '%</span></div>' +
-    '<div class="bar-track"><div class="bar-fill ' + (colors[d.name]||'bg-accent-red') + '" style="width:' + (d.score*100) + '%"></div></div></div>'
+    '<div class="bar-track"><div class="bar-fill ' + (colors[d.name]||'bg-accent-primary') + '" style="width:' + (d.score*100) + '%"></div></div></div>'
   ).join('');
 }
 
@@ -877,15 +883,15 @@ async function renderSectorChart() {
   if (sectorChart) sectorChart.destroy();
   const ctx = document.getElementById('sector-chart').getContext('2d');
 
-  // Red gradient fill (losers)
-  const redGrad = ctx.createLinearGradient(0, 0, 0, 300);
-  redGrad.addColorStop(0, 'rgba(192,57,43,0.35)');
-  redGrad.addColorStop(1, 'rgba(192,57,43,0.02)');
+  // Emerald gradient fill (gainers)
+  const emeraldGrad = ctx.createLinearGradient(0, 0, 0, 300);
+  emeraldGrad.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+  emeraldGrad.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
 
-  // Green gradient fill (gainers)
-  const greenGrad = ctx.createLinearGradient(0, 0, 0, 300);
-  greenGrad.addColorStop(0, 'rgba(34,197,94,0.03)');
-  greenGrad.addColorStop(1, 'rgba(34,197,94,0.25)');
+  // Gold gradient fill (losers)
+  const goldGrad = ctx.createLinearGradient(0, 0, 0, 300);
+  goldGrad.addColorStop(0, 'rgba(251, 191, 36, 0.2)');
+  goldGrad.addColorStop(1, 'rgba(251, 191, 36, 0.01)');
 
   sectorChart = new Chart(ctx, {
     type: 'line',
@@ -957,10 +963,10 @@ async function renderSectorChart() {
 function renderTrace(trace) {
   document.getElementById('trace-info').innerHTML =
     '<div class="grid grid-cols-3 gap-3">' +
-    '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-accent-red">' + trace.total_spans + '</div><div class="text-[9px] text-txt-muted uppercase">Spans</div></div>' +
+    '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-accent-primary">' + trace.total_spans + '</div><div class="text-[9px] text-txt-muted uppercase">Spans</div></div>' +
     '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-emerald-400">' + trace.total_duration_ms + 'ms</div><div class="text-[9px] text-txt-muted uppercase">Latency</div></div>' +
     '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-purple-400">' + trace.token_usage.total + '</div><div class="text-[9px] text-txt-muted uppercase">Tokens</div></div></div>';
-  const sc = ['bg-accent-red','bg-blue-500','bg-emerald-500','bg-purple-500','bg-amber-500'];
+  const sc = ['bg-accent-primary','bg-accent-gold','bg-emerald-500','bg-purple-500','bg-accent-red'];
   document.getElementById('pipeline-stages').innerHTML = trace.spans.map((s, i) =>
     '<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full ' + sc[i%sc.length] + '"></div>' +
     '<span class="text-[11px] text-txt-muted flex-1">' + s.name.replace(/_/g,' ') + '</span>' +
