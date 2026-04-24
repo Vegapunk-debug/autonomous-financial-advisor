@@ -428,14 +428,14 @@
 
   <!-- Sidebar -->
   <nav class="sidebar">
-    <div class="mb-8">
+    <a href="/" class="mb-8 hover:opacity-80 transition-opacity">
       <div
         class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
         <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
       </div>
-    </div>
+    </a>
 
     <div class="sidebar-icon active" title="Dashboard" data-section="dashboard">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -581,11 +581,11 @@
     <!-- Header -->
     <header
       class="px-8 py-6 border-b border-bg-border flex items-center justify-between sticky top-0 z-40 bg-bg-primary/70 backdrop-blur-md">
-      <div>
+      <a href="/" class="hover:opacity-80 transition-opacity">
         <h1 class="text-xl font-bold tracking-tight">AlphaReason <span
             class="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">AI</span></h1>
         <p class="text-[11px] text-txt-muted tracking-widest uppercase mt-0.5">Autonomous Reasoning Engine</p>
-      </div>
+      </a>
       <div class="flex items-center gap-5">
         <select id="model-select" onchange="reloadCurrentPortfolio()"
           class="bg-bg-secondary border border-bg-border text-txt-secondary text-xs rounded-md px-2 py-1 outline-none cursor-pointer hover:border-txt-muted transition-colors mr-2">
