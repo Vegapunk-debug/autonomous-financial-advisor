@@ -53,8 +53,11 @@ async def list_portfolios():
 async def get_market_data():
     market = agent.loader.get_market_data()
     historical = agent.loader.get_historical_data()
+    indices = market.get("indices", {})
+    sentiment = indices.get("NIFTY50", {}).get("sentiment", "NEUTRAL")
     return {
-        "indices": market.get("indices", {}),
+        "indices": indices,
+        "sentiment": sentiment,
         "sector_performance": market.get("sector_performance", {}),
         "market_breadth": historical.get("market_breadth", {}),
         "fii_dii": historical.get("fii_dii_data", {}),

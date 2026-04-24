@@ -34,6 +34,10 @@ class BriefingEvaluator:
         scores.append(self._eval_risk_identification(briefing, portfolio_data))
         scores.append(self._eval_confidence_calibration(briefing))
         scores.append(self._eval_conciseness(briefing))
+        
+        # Phase 4 extension: LLM-based reasoning quality
+        if hasattr(briefing, 'narrative') and briefing.narrative:
+            scores.append(self._eval_llm_reasoning_quality(briefing.narrative, market_data))
 
         # Weighted average
         total_weight = sum(s.weight for s in scores)
@@ -158,6 +162,40 @@ class BriefingEvaluator:
         if text_len > 3000:
             return EvalScore("conciseness", 0.5, "Briefing may be too verbose", weight=0.5)
         return EvalScore("conciseness", 1.0, f"Briefing length appropriate ({text_len} chars)", weight=0.5)
+
+    def _eval_llm_reasoning_quality(self, narrative: str, market: dict) -> EvalScore:
+        """Use LLM to grade the qualitative reasoning of the narrative."""
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            return EvalScore("reasoning_quality", 0.5, "Skipped: GROQ_API_KEY missing", weight=2.0)
+
+        prompt = f"""
+        Evaluate the following financial advisory narrative for reasoning quality.
+        The narrative should correctly link market news to portfolio impact.
+        
+        Market Data Summary: {market.get('sentiment', 'N/A')}
+        Narrative: {narrative}
+        
+        Grade the narrative from 0.0 to 1.0 on:
+        1. Causal Accuracy (Is the logic sound?)
+        2. Professionalism (Does it sound like a real advisor?)
+        3. Insight (Does it provide value beyond just data?)
+        
+        Output ONLY a JSON object: {{"score": float, "reason": "short explanation"}}
+        """
+        try:
+            from groq import Groq
+            client = Groq(api_key=api_key)
+            response = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama-3.1-8b-instant",
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            res = json.loads(response.choices[0].message.content)
+            return EvalScore("reasoning_quality", res.get("score", 0.5), res.get("reason", "LLM graded"), weight=2.0)
+        except Exception as e:
+            return EvalScore("reasoning_quality", 0.5, f"LLM Eval failed: {e}", weight=2.0)
 
     def _score_to_grade(self, score: float) -> str:
         if score >= 0.85:

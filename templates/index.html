@@ -1,1049 +1,1251 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AlphaReason AI — Autonomous Financial Advisor</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        bg: { primary: '#050505', secondary: '#0a0a0a', card: '#0f0f0f', hover: '#151515', border: '#1c1c1c' },
-        accent: { 
-          primary: 'var(--accent-primary)', 
-          primaryLight: 'var(--accent-primary-light)', 
-          primaryGlow: 'var(--accent-primary-glow)',
-          gold: '#f59e0b',
-          red: '#ef4444'
-        },
-        txt: { primary: '#ffffff', secondary: '#a0a0a0', muted: '#505050' }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlphaReason AI — Autonomous Financial Advisor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: { primary: '#000000', secondary: '#050505', card: 'rgba(15, 15, 15, 0.4)', hover: '#0a0a0a', border: '#111111' },
+            accent: { red: '#c0392b', redLight: '#e74c3c', redGlow: 'rgba(192,57,43,0.15)' },
+            txt: { primary: '#ffffff', secondary: '#a1a1a1', muted: '#636366' }
+          }
+        }
       }
     }
-  }
-}
-</script>
-<style>
-:root {
-  --accent-primary: #10b981;
-  --accent-primary-light: #34d399;
-  --accent-primary-glow: rgba(16, 185, 129, 0.15);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: radial-gradient(circle at 10% 20%, var(--accent-primary-glow), transparent 45%),
-              radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.04), transparent 45%),
-              radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0.5), transparent 60%),
-              #050505;
-  background-attachment: fixed;
-  color: #ffffff;
-  min-height: 100vh;
-  display: flex;
-}
-.mono { font-family: 'JetBrains Mono', monospace; }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/* Sidebar */
-.sidebar {
-  width: 72px;
-  min-height: 100vh;
-  background: rgba(10, 11, 18, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(255, 255, 255, 0.03);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px 0;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 50;
-}
-.sidebar-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #55556a;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 4px;
-  position: relative;
-}
-.sidebar-icon:hover, .sidebar-icon.active {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e8e8ec;
-}
-.sidebar-icon.active::before {
-  content: '';
-  position: absolute;
-  left: -14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 20px;
-  background: #10b981;
-  border-radius: 0 3px 3px 0;
-}
-.sidebar-label {
-  font-size: 9px;
-  color: #55556a;
-  margin-top: 2px;
-  text-align: center;
-  letter-spacing: 0.3px;
-}
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* Main content */
-.main { margin-left: 72px; flex: 1; min-height: 100vh; position: relative; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #000000;
+      background-attachment: fixed;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+    }
 
-/* Cards */
-.card {
-  background: rgba(15, 15, 15, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-.card:hover { 
-  border-color: rgba(16, 185, 129, 0.2); 
-  background: rgba(20, 20, 20, 0.7);
-  box-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.05);
-}
-.card-flat {
-  background: transparent;
-  border: 1px solid #1a1b27;
-  border-radius: 14px;
-}
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-/* Portfolio selector */
-.port-card {
-  cursor: pointer;
-  transition: all 0.25s ease;
-  position: relative;
-}
-.port-card:hover:not(.active) {
-  transform: translateY(-2px);
-  border-color: #252638;
-  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);
-}
-.port-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: transparent;
-  border-radius: 12px 12px 0 0;
-  transition: background 0.25s ease;
-}
-.port-card.active::before { background: #10b981; }
-.port-card.active { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.03); }
+    /* Sidebar */
+    .sidebar {
+      width: 72px;
+      min-height: 100vh;
+      background: rgba(5, 5, 5, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 50;
+    }
 
-/* Red dot accent */
-.dot-emerald {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-  flex-shrink: 0;
-}
+    .sidebar-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #55556a;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+      position: relative;
+    }
 
-/* Divider */
-.divider { height: 1px; background: #1a1b27; }
+    .sidebar-icon:hover,
+    .sidebar-icon.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: #e8e8ec;
+    }
 
-/* Chain */
-.chain-track {
-  position: relative;
-  padding-left: 28px;
-}
-.chain-track::before {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 8px;
-  bottom: 8px;
-  width: 1px;
-  background: linear-gradient(180deg, #10b981 0%, #050505 100%);
-}
-.chain-step {
-  position: relative;
-  padding: 10px 0;
-  animation: chainIn 0.35s ease-out both;
-}
-.chain-step::before {
-  content: '';
-  position: absolute;
-  left: -24px;
-  top: 16px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1.5px solid #10b981;
-  background: #050505;
-}
-.chain-step:first-child::before { background: #10b981; }
-.chain-step:last-child::before { background: #10b981; }
+    .sidebar-icon.active::before {
+      content: '';
+      position: absolute;
+      left: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: #c0392b;
+      border-radius: 0 3px 3px 0;
+    }
 
-@keyframes chainIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.anim { animation: fadeIn 0.4s ease-out both; }
-.anim-1 { animation-delay: 0.1s; }
-.anim-2 { animation-delay: 0.2s; }
-.anim-3 { animation-delay: 0.3s; }
-.anim-4 { animation-delay: 0.4s; }
+    .sidebar-label {
+      font-size: 9px;
+      color: #55556a;
+      margin-top: 2px;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
 
-@keyframes skeletonPulse {
-  0% { background-color: #10111a; }
-  50% { background-color: #14151f; }
-  100% { background-color: #10111a; }
-}
-.skeleton {
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-  border-radius: 4px;
-}
+    /* Main content */
+    .main {
+      margin-left: 72px;
+      flex: 1;
+      min-height: 100vh;
+      position: relative;
+    }
 
-/* Markdown Prose Customization */
-.prose ul > li::marker { color: #10b981; }
-.prose blockquote { border-left-color: #10b981; color: #a0a0a0; font-style: italic; background: rgba(16, 185, 129, 0.05); padding: 4px 12px; border-radius: 0 4px 4px 0; }
-.prose strong { color: #ffffff; font-weight: 600; }
-.prose p { margin-bottom: 0.75em; }
+    /* Cards */
+    .card {
+      background: rgba(16, 17, 26, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      border-radius: 14px;
+      transition: all 0.3s ease;
+    }
 
-/* Score arc */
-.score-container {
-  width: 100px; height: 100px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.score-container svg { position: absolute; inset: 0; transform: rotate(-90deg); }
-.score-container circle { fill: none; stroke-linecap: round; }
-.score-bg { stroke: #1a1b27; stroke-width: 3; }
-.score-fg { stroke-width: 3; stroke-dasharray: 283; transition: stroke-dashoffset 1.2s ease-out; }
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.08);
+      background: rgba(16, 17, 26, 0.65);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1a1b27; border-radius: 2px; }
+    .card-flat {
+      background: transparent;
+      border: 1px solid #1a1b27;
+      border-radius: 14px;
+    }
 
-/* Tab */
-.tab-btn {
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #55556a;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-}
-.tab-btn:hover { color: #8b8b9e; }
-.tab-btn.active { color: #e8e8ec; background: #14151f; border-color: #1a1b27; }
+    /* Portfolio selector */
+    .port-card {
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
 
-/* Bar */
-.bar-track { height: 4px; background: #1a1b27; border-radius: 2px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease-out; }
+    .port-card:hover:not(.active) {
+      transform: translateY(-2px);
+      border-color: #252638;
+      box-shadow: 0 10px 25px -5px rgba(192, 57, 43, 0.1);
+    }
 
-.badge-sm {
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
+    .port-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: transparent;
+      border-radius: 14px 14px 0 0;
+      transition: background 0.25s ease;
+    }
 
-.loader {
-  width: 28px; height: 28px;
-  border: 2px solid #1a1b27;
-  border-top-color: #10b981;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-</style>
+    .port-card.active::before {
+      background: #c0392b;
+    }
+
+    .port-card.active {
+      border-color: #2a1a1a;
+      background: #110e12;
+    }
+
+    /* Red dot accent */
+    .dot-red {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #c0392b;
+      box-shadow: 0 0 12px rgba(192, 57, 43, 0.4);
+      flex-shrink: 0;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: #1a1b27;
+    }
+
+    /* Chain */
+    .chain-track {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .chain-track::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(180deg, #c0392b 0%, #2a1a27 100%);
+    }
+
+    .chain-step {
+      position: relative;
+      padding: 10px 0;
+      animation: chainIn 0.35s ease-out both;
+    }
+
+    .chain-step::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 16px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1.5px solid #c0392b;
+      background: #07080d;
+    }
+
+    .chain-step:first-child::before {
+      background: #c0392b;
+    }
+
+    .chain-step:last-child::before {
+      background: #c0392b;
+    }
+
+    @keyframes chainIn {
+      from {
+        opacity: 0;
+        transform: translateX(-12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .anim {
+      animation: fadeIn 0.4s ease-out both;
+    }
+
+    .anim-1 {
+      animation-delay: 0.1s;
+    }
+
+    .anim-2 {
+      animation-delay: 0.2s;
+    }
+
+    .anim-3 {
+      animation-delay: 0.3s;
+    }
+
+    .anim-4 {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes skeletonPulse {
+      0% {
+        background-color: #10111a;
+      }
+
+      50% {
+        background-color: #14151f;
+      }
+
+      100% {
+        background-color: #10111a;
+      }
+    }
+
+    .skeleton {
+      animation: skeletonPulse 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+
+    /* Markdown Prose Customization */
+    .prose ul>li::marker {
+      color: #c0392b;
+    }
+
+    .prose blockquote {
+      border-left-color: #c0392b;
+      color: #8b8b9e;
+      font-style: italic;
+      background: rgba(192, 57, 43, 0.05);
+      padding: 4px 12px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .prose strong {
+      color: #e8e8ec;
+      font-weight: 600;
+    }
+
+    .prose p {
+      margin-bottom: 0.75em;
+    }
+
+    /* Score arc */
+    .score-container {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-container svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+
+    .score-container circle {
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    .score-bg {
+      stroke: #1a1b27;
+      stroke-width: 3;
+    }
+
+    .score-fg {
+      stroke-width: 3;
+      stroke-dasharray: 283;
+      transition: stroke-dashoffset 1.2s ease-out;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1a1b27;
+      border-radius: 2px;
+    }
+
+    /* Tab */
+    .tab-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #55556a;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .tab-btn:hover {
+      color: #8b8b9e;
+    }
+
+    .tab-btn.active {
+      color: #e8e8ec;
+      background: #14151f;
+      border-color: #1a1b27;
+    }
+
+    /* Bar */
+    .bar-track {
+      height: 4px;
+      background: #1a1b27;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.8s ease-out;
+    }
+
+    .badge-sm {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .loader {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #1a1b27;
+      border-top-color: #c0392b;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Sidebar -->
-<nav class="sidebar">
-  <div class="mb-8">
-    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 flex items-center justify-center">
-      <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-    </div>
-  </div>
-
-  <div class="sidebar-icon active" title="Dashboard" data-section="dashboard">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zm0 6a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5zM4 13a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z"/></svg>
-  </div>
-  <span class="sidebar-label mb-3">Dashboard</span>
-
-  <div class="sidebar-icon" title="Analysis" data-section="analysis">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-  </div>
-  <span class="sidebar-label mb-3">Analysis</span>
-
-  <div class="sidebar-icon" title="Reasoning" data-section="reasoning">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-  </div>
-  <span class="sidebar-label mb-3">Reasoning</span>
-
-  <div class="sidebar-icon" title="Trace" data-section="trace">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-  </div>
-  <span class="sidebar-label mb-3">Trace</span>
-
-  <div class="flex-1"></div>
-
-  <div class="sidebar-icon" title="About" onclick="toggleAbout()">
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-  </div>
-  <span class="sidebar-label">About</span>
-</nav>
-
-<!-- About Modal -->
-<div id="about-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleAbout()"></div>
-  <div class="relative card p-8 max-w-xl w-full mx-4 border-t-2 border-t-accent-primary" style="animation: fadeIn 0.3s ease-out">
-    <button onclick="toggleAbout()" class="absolute top-4 right-4 text-txt-muted hover:text-txt-primary transition-colors">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-
-    <div class="flex items-center gap-3 mb-6">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 flex items-center justify-center">
-        <svg class="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-      </div>
-      <div>
-        <h2 class="text-lg font-bold">AlphaReason<span class="text-accent-primary">AI</span></h2>
-        <p class="text-[11px] text-txt-muted tracking-widest uppercase">Autonomous Reasoning Engine</p>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="mb-8">
+      <div
+        class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
       </div>
     </div>
 
-    <p class="text-[13px] text-txt-secondary leading-relaxed mb-4">
-      An autonomous financial advisor agent that <strong class="text-txt-primary">reasons through market data</strong> — not just reports it. It ingests market signals, financial news, and user portfolios, then builds causal explanations of why your portfolio moved.
-    </p>
-
-    <div class="divider mb-4"></div>
-
-    <div class="grid grid-cols-2 gap-4 mb-4">
-      <div>
-        <span class="text-[10px] text-txt-muted uppercase tracking-widest">Architecture</span>
-        <p class="text-xs text-txt-secondary mt-1">5-phase pipeline: Data Ingestion &rarr; Market Intelligence &rarr; Portfolio Analytics &rarr; Causal Reasoning &rarr; Self-Evaluation</p>
-      </div>
-      <div>
-        <span class="text-[10px] text-txt-muted uppercase tracking-widest">LLM Usage</span>
-        <p class="text-xs text-txt-secondary mt-1">Hybrid Architecture: Deterministic rule-based causal logic + Dynamic Groq LLM narrative generation.</p>
-      </div>
-      <div>
-        <span class="text-[10px] text-txt-muted uppercase tracking-widest">Data</span>
-        <p class="text-xs text-txt-secondary mt-1">40 stocks, 5 indices, 25 news articles, 12 mutual funds, 3 portfolio samples, 7-day historical trends</p>
-      </div>
-      <div>
-        <span class="text-[10px] text-txt-muted uppercase tracking-widest">Observability</span>
-        <p class="text-xs text-txt-secondary mt-1">Langfuse-ready tracing, span-level timing, structured logging, pipeline visualization</p>
-      </div>
+    <div class="sidebar-icon active" title="Dashboard" data-section="dashboard">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zm0 6a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5zM4 13a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z" />
+      </svg>
     </div>
+    <span class="sidebar-label mb-3">Dashboard</span>
 
-    <div class="divider mb-4"></div>
+    <div class="sidebar-icon" title="Analysis" data-section="analysis">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    </div>
+    <span class="sidebar-label mb-3">Analysis</span>
 
-    <div class="mb-4">
-      <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Capabilities</span>
-      <div class="mt-2 space-y-2">
-        <div class="flex items-start gap-2">
-          <div class="dot-emerald mt-1.5"></div>
-          <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Causal Linking</strong> — Traces News &rarr; Sector &rarr; Stock &rarr; Portfolio impact with confidence scores</p>
+    <div class="sidebar-icon" title="Reasoning" data-section="reasoning">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    </div>
+    <span class="sidebar-label mb-3">Reasoning</span>
+
+    <div class="sidebar-icon" title="Trace" data-section="trace">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    </div>
+    <span class="sidebar-label mb-3">Trace</span>
+
+    <div class="flex-1"></div>
+
+    <div class="sidebar-icon" title="About" onclick="toggleAbout()">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <span class="sidebar-label">About</span>
+  </nav>
+
+  <!-- About Modal -->
+  <div id="about-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleAbout()"></div>
+    <div class="relative card p-8 max-w-xl w-full mx-4 border-t-2 border-t-accent-red"
+      style="animation: fadeIn 0.3s ease-out">
+      <button onclick="toggleAbout()"
+        class="absolute top-4 right-4 text-txt-muted hover:text-txt-primary transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
+          <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
         </div>
-        <div class="flex items-start gap-2">
-          <div class="dot-emerald mt-1.5"></div>
-          <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Conflict Resolution</strong> — Detects when price contradicts news sentiment and explains why</p>
-        </div>
-        <div class="flex items-start gap-2">
-          <div class="dot-emerald mt-1.5"></div>
-          <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Risk Detection</strong> — Flags concentration risk, single-stock exposure, rate sensitivity</p>
-        </div>
-        <div class="flex items-start gap-2">
-          <div class="dot-emerald mt-1.5"></div>
-          <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Self-Evaluation</strong> — Grades its own reasoning on 6 dimensions (A/B/C/D/F)</p>
+        <div>
+          <h2 class="text-lg font-bold">AlphaReason<span class="text-accent-red">AI</span></h2>
+          <p class="text-[11px] text-txt-muted tracking-widest uppercase">Autonomous Reasoning Engine</p>
         </div>
       </div>
-    </div>
 
-    <div class="divider mb-4"></div>
+      <p class="text-[13px] text-txt-secondary leading-relaxed mb-4">
+        An autonomous financial advisor agent that <strong class="text-txt-primary">reasons through market data</strong>
+        — not just reports it. It ingests market signals, financial news, and user portfolios, then builds causal
+        explanations of why your portfolio moved.
+      </p>
 
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <span class="mono text-[11px] text-txt-muted">Python + FastAPI + Chart.js</span>
+      <div class="divider mb-4"></div>
+
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Architecture</span>
+          <p class="text-xs text-txt-secondary mt-1">5-phase pipeline: Data Ingestion &rarr; Market Intelligence &rarr;
+            Portfolio Analytics &rarr; Causal Reasoning &rarr; Self-Evaluation</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-txt-muted uppercase tracking-widest">LLM Usage</span>
+          <p class="text-xs text-txt-secondary mt-1">Hybrid Architecture: Deterministic rule-based causal logic +
+            Dynamic Groq LLM narrative generation.</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Data</span>
+          <p class="text-xs text-txt-secondary mt-1">40 stocks, 5 indices, 25 news articles, 12 mutual funds, 3
+            portfolio samples, 7-day historical trends</p>
+        </div>
+        <div>
+          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Observability</span>
+          <p class="text-xs text-txt-secondary mt-1">Langfuse-ready tracing, span-level timing, structured logging,
+            pipeline visualization</p>
+        </div>
       </div>
-      <span class="text-[10px] text-txt-muted">Built for Backend Engineering Challenge</span>
-    </div>
-  </div>
-</div>
 
-<!-- Main Content -->
-<main class="main">
-  <!-- Header -->
-  <header class="px-8 py-6 border-b border-bg-border flex items-center justify-between sticky top-0 z-40 bg-bg-primary/70 backdrop-blur-md">
-    <div>
-      <h1 class="text-xl font-bold tracking-tight">AlphaReason <span class="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">AI</span></h1>
-      <p class="text-[11px] text-txt-muted tracking-widest uppercase mt-0.5">Autonomous Reasoning Engine</p>
-    </div>
-    <div class="flex items-center gap-5">
-      <select id="model-select" onchange="reloadCurrentPortfolio()" class="bg-bg-secondary border border-bg-border text-txt-secondary text-xs rounded-md px-2 py-1 outline-none cursor-pointer hover:border-txt-muted transition-colors mr-2">
-        <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
-        <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
-        <option value="gemma2-9b-it">Gemma 2 9B</option>
-      </select>
-      <div class="flex items-center gap-2">
-        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-        <span class="text-xs text-txt-secondary">Live</span>
-      </div>
-      <span class="mono text-sm text-txt-secondary">April 21, 2026</span>
-      <div id="market-badge" class="badge-sm bg-accent-primaryGlow text-accent-primary">BULLISH</div>
-    </div>
-  </header>
+      <div class="divider mb-4"></div>
 
-  <!-- Ticker -->
-  <div class="px-8 py-4 border-b border-bg-border">
-    <div class="flex gap-8" id="indices-row"></div>
-  </div>
-
-  <div class="px-8 py-6">
-
-    <!-- Portfolio Selector -->
-    <div class="mb-2">
-      <div class="flex items-center gap-2 mb-4">
-        <div class="dot-emerald"></div>
-        <h2 class="text-sm font-semibold tracking-wide">Select Portfolio</h2>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 mb-8">
-      <div class="port-card card p-5 active anim" data-id="PORTFOLIO_001" onclick="selectPortfolio('PORTFOLIO_001', this)">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">R</div>
-          <div class="flex-1">
-            <h3 class="text-sm font-semibold" id="p1-name">-</h3>
-            <p class="text-[11px] text-txt-muted" id="p1-desc"></p>
+      <div class="mb-4">
+        <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Capabilities</span>
+        <div class="mt-2 space-y-2">
+          <div class="flex items-start gap-2">
+            <div class="dot-red mt-1.5"></div>
+            <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Causal Linking</strong> — Traces News
+              &rarr; Sector &rarr; Stock &rarr; Portfolio impact with confidence scores</p>
           </div>
-          <span class="badge-sm bg-emerald-500/10 text-emerald-400">Diversified</span>
-        </div>
-        <div class="divider mb-3"></div>
-        <div class="flex justify-between">
-          <div><span class="text-[10px] text-txt-muted uppercase">Value</span><p class="mono text-sm font-semibold" id="p1-value"></p></div>
-          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-emerald-400" id="p1-risk"></p></div>
-        </div>
-      </div>
-      <div class="port-card card p-5 anim" style="animation-delay:0.05s" data-id="PORTFOLIO_002" onclick="selectPortfolio('PORTFOLIO_002', this)">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">P</div>
-          <div class="flex-1">
-            <h3 class="text-sm font-semibold" id="p2-name">-</h3>
-            <p class="text-[11px] text-txt-muted" id="p2-desc"></p>
+          <div class="flex items-start gap-2">
+            <div class="dot-red mt-1.5"></div>
+            <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Conflict Resolution</strong> —
+              Detects when price contradicts news sentiment and explains why</p>
           </div>
-          <span class="badge-sm bg-emerald-500/10 text-emerald-400">Concentrated</span>
-        </div>
-        <div class="divider mb-3"></div>
-        <div class="flex justify-between">
-          <div><span class="text-[10px] text-txt-muted uppercase">Value</span><p class="mono text-sm font-semibold" id="p2-value"></p></div>
-          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-emerald-400" id="p2-risk"></p></div>
-        </div>
-      </div>
-      <div class="port-card card p-5 anim" style="animation-delay:0.1s" data-id="PORTFOLIO_003" onclick="selectPortfolio('PORTFOLIO_003', this)">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">A</div>
-          <div class="flex-1">
-            <h3 class="text-sm font-semibold" id="p3-name">-</h3>
-            <p class="text-[11px] text-txt-muted" id="p3-desc"></p>
+          <div class="flex items-start gap-2">
+            <div class="dot-red mt-1.5"></div>
+            <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Risk Detection</strong> — Flags
+              concentration risk, single-stock exposure, rate sensitivity</p>
           </div>
-          <span class="badge-sm bg-emerald-500/10 text-emerald-400">Conservative</span>
-        </div>
-        <div class="divider mb-3"></div>
-        <div class="flex justify-between">
-          <div><span class="text-[10px] text-txt-muted uppercase">Value</span><p class="mono text-sm font-semibold" id="p3-value"></p></div>
-          <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span><p class="text-sm text-emerald-400" id="p3-risk"></p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Agent Thinking -->
-    <div id="agent-thinking" class="hidden mb-6">
-      <div class="card p-6 border-accent-primaryGlow border shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="loader"></div>
-          <div>
-            <div class="text-sm font-semibold">Agent Reasoning...</div>
-            <div class="text-[11px] text-txt-muted uppercase tracking-widest">Querying LLM Engine</div>
+          <div class="flex items-start gap-2">
+            <div class="dot-red mt-1.5"></div>
+            <p class="text-xs text-txt-secondary"><strong class="text-txt-primary">Self-Evaluation</strong> — Grades its
+              own reasoning on 6 dimensions (A/B/C/D/F)</p>
           </div>
         </div>
-        <div id="thinking-steps" class="space-y-2 mono text-xs mb-6"></div>
-        <div class="space-y-3 mt-4 pt-4 border-t border-bg-border">
-          <div class="skeleton h-3.5 w-3/4"></div>
-          <div class="skeleton h-3.5 w-full"></div>
-          <div class="skeleton h-3.5 w-5/6"></div>
-          <div class="skeleton h-3.5 w-1/2 mt-4"></div>
+      </div>
+
+      <div class="divider mb-4"></div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="mono text-[11px] text-txt-muted">Python + FastAPI + Chart.js</span>
         </div>
+        <span class="text-[10px] text-txt-muted">Built for Backend Engineering Challenge</span>
       </div>
     </div>
+  </div>
 
-    <!-- Content -->
-    <div id="main-content" class="hidden">
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Header -->
+    <header
+      class="px-8 py-6 border-b border-bg-border flex items-center justify-between sticky top-0 z-40 bg-bg-primary/70 backdrop-blur-md">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">AlphaReason <span
+            class="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">AI</span></h1>
+        <p class="text-[11px] text-txt-muted tracking-widest uppercase mt-0.5">Autonomous Reasoning Engine</p>
+      </div>
+      <div class="flex items-center gap-5">
+        <select id="model-select" onchange="reloadCurrentPortfolio()"
+          class="bg-bg-secondary border border-bg-border text-txt-secondary text-xs rounded-md px-2 py-1 outline-none cursor-pointer hover:border-txt-muted transition-colors mr-2">
+          <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+          <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+          <option value="gemma2-9b-it">Gemma 2 9B</option>
+        </select>
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="text-xs text-txt-secondary">Live</span>
+        </div>
+        <span class="mono text-sm text-txt-secondary">April 21, 2026</span>
+        <div id="market-badge" class="badge-sm bg-red-500/10 text-red-400">BEARISH</div>
+      </div>
+    </header>
 
-      <!-- Narrative Briefing -->
-      <div class="card p-6 mb-5 anim anim-1 border-l-2 border-l-accent-primary">
+    <!-- Ticker -->
+    <div class="px-8 py-4 border-b border-bg-border">
+      <div class="flex gap-8" id="indices-row"></div>
+    </div>
+
+    <div class="px-8 py-6">
+
+      <!-- Portfolio Selector -->
+      <div class="mb-2">
         <div class="flex items-center gap-2 mb-4">
-          <div class="dot-emerald"></div>
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Advisor Briefing</span>
-          <span class="badge-sm bg-accent-primaryGlow text-accent-primary ml-auto">Autonomous</span>
+          <div class="dot-red"></div>
+          <h2 class="text-sm font-semibold tracking-wide">Select Portfolio</h2>
         </div>
-        <div id="narrative" class="prose prose-invert prose-sm max-w-none text-txt-secondary leading-[1.8] space-y-3"></div>
       </div>
 
-      <!-- Section: Dashboard -->
-      <div id="section-dashboard" class="scroll-mt-4"></div>
-      <div class="grid grid-cols-12 gap-5 mb-5">
-        <div class="col-span-4 card p-6 anim anim-2">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Today's P&L</span>
-          <div id="pnl-value" class="text-3xl font-bold mono mt-2 mb-1"></div>
-          <div id="pnl-pct" class="text-base font-semibold mono mb-4"></div>
-          <div class="divider mb-4"></div>
-          <div class="grid grid-cols-2 gap-4">
-            <div><span class="text-[10px] text-txt-muted uppercase">Total Value</span><p id="total-value" class="mono text-sm font-medium mt-1"></p></div>
-            <div><span class="text-[10px] text-txt-muted uppercase">Type</span><p id="portfolio-type" class="text-sm font-medium mt-1"></p></div>
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="port-card card p-5 active anim" data-id="PORTFOLIO_001"
+          onclick="selectPortfolio('PORTFOLIO_001', this)">
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-sm font-bold">
+              R</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold" id="p1-name">-</h3>
+              <p class="text-[11px] text-txt-muted" id="p1-desc"></p>
+            </div>
+            <span class="badge-sm bg-emerald-500/10 text-emerald-400">Diversified</span>
           </div>
-        </div>
-
-        <div class="col-span-3 card p-6 anim anim-3 flex flex-col items-center justify-center">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest mb-3">Reasoning Quality</span>
-          <div class="score-container">
-            <svg viewBox="0 0 100 100"><circle class="score-bg" cx="50" cy="50" r="45"/><circle class="score-fg" cx="50" cy="50" r="45" id="score-circle"/></svg>
-            <div class="text-center z-10">
-              <div id="score-grade" class="text-2xl font-black"></div>
-              <div id="score-pct" class="text-[10px] text-txt-muted mono"></div>
+          <div class="divider mb-3"></div>
+          <div class="flex justify-between">
+            <div><span class="text-[10px] text-txt-muted uppercase">Value</span>
+              <p class="mono text-sm font-semibold" id="p1-value"></p>
+            </div>
+            <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span>
+              <p class="text-sm text-emerald-400" id="p1-risk"></p>
             </div>
           </div>
         </div>
-
-        <div class="col-span-5 card p-6 anim" style="animation-delay:0.1s">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="dot-emerald"></div>
-            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Insight</span>
+        <div class="port-card card p-5 anim" style="animation-delay:0.05s" data-id="PORTFOLIO_002"
+          onclick="selectPortfolio('PORTFOLIO_002', this)">
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 text-sm font-bold">P
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold" id="p2-name">-</h3>
+              <p class="text-[11px] text-txt-muted" id="p2-desc"></p>
+            </div>
+            <span class="badge-sm bg-red-500/10 text-red-400">Concentrated</span>
           </div>
-          <p id="key-takeaway" class="text-[13px] leading-relaxed text-txt-secondary"></p>
-        </div>
-      </div>
-
-      <!-- Section: Analysis -->
-      <div id="section-analysis" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Analysis</span></div>
-      </div>
-      <div class="grid grid-cols-12 gap-5 mb-5">
-        <div class="col-span-5 card p-6 anim" style="animation-delay:0.15s">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Holdings Impact</span>
-          <div id="holdings-list" class="mt-4 space-y-1 max-h-[300px] overflow-y-auto"></div>
-        </div>
-
-        <div class="col-span-7 card p-6 anim" style="animation-delay:0.2s">
-          <div class="flex items-center justify-between mb-4">
-            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Causal Analysis</span>
-            <div class="flex gap-1" id="chain-tabs"></div>
+          <div class="divider mb-3"></div>
+          <div class="flex justify-between">
+            <div><span class="text-[10px] text-txt-muted uppercase">Value</span>
+              <p class="mono text-sm font-semibold" id="p2-value"></p>
+            </div>
+            <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span>
+              <p class="text-sm text-red-400" id="p2-risk"></p>
+            </div>
           </div>
-          <div id="chain-content"></div>
+        </div>
+        <div class="port-card card p-5 anim" style="animation-delay:0.1s" data-id="PORTFOLIO_003"
+          onclick="selectPortfolio('PORTFOLIO_003', this)">
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 text-sm font-bold">
+              A</div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold" id="p3-name">-</h3>
+              <p class="text-[11px] text-txt-muted" id="p3-desc"></p>
+            </div>
+            <span class="badge-sm bg-blue-500/10 text-blue-400">Conservative</span>
+          </div>
+          <div class="divider mb-3"></div>
+          <div class="flex justify-between">
+            <div><span class="text-[10px] text-txt-muted uppercase">Value</span>
+              <p class="mono text-sm font-semibold" id="p3-value"></p>
+            </div>
+            <div class="text-right"><span class="text-[10px] text-txt-muted uppercase">Risk</span>
+              <p class="text-sm text-blue-400" id="p3-risk"></p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Section: Reasoning -->
-      <div id="section-reasoning" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Reasoning &amp; Risk</span></div>
+      <!-- Agent Thinking -->
+      <div id="agent-thinking" class="hidden mb-6">
+        <div class="card p-6 border-accent-redGlow border shadow-[0_0_15px_rgba(192,57,43,0.15)]">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="loader"></div>
+            <div>
+              <div class="text-sm font-semibold">Agent Reasoning...</div>
+              <div class="text-[11px] text-txt-muted uppercase tracking-widest">Querying LLM Engine</div>
+            </div>
+          </div>
+          <div id="thinking-steps" class="space-y-2 mono text-xs mb-6"></div>
+          <div class="space-y-3 mt-4 pt-4 border-t border-bg-border">
+            <div class="skeleton h-3.5 w-3/4"></div>
+            <div class="skeleton h-3.5 w-full"></div>
+            <div class="skeleton h-3.5 w-5/6"></div>
+            <div class="skeleton h-3.5 w-1/2 mt-4"></div>
+          </div>
+        </div>
       </div>
-      <div class="grid grid-cols-12 gap-5 mb-5">
-        <div class="col-span-4 card p-6 anim" style="animation-delay:0.25s">
+
+      <!-- Content -->
+      <div id="main-content" class="hidden">
+
+        <!-- Narrative Briefing -->
+        <div class="card p-6 mb-5 anim anim-1 border-l-2 border-l-accent-red">
           <div class="flex items-center gap-2 mb-4">
-            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Conflicting Signals</span>
+            <div class="dot-red"></div>
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Advisor Briefing</span>
+            <span class="badge-sm bg-accent-redGlow text-accent-red ml-auto">Autonomous</span>
           </div>
-          <div id="conflicts-list" class="space-y-3"></div>
-          <div id="no-conflicts" class="hidden text-xs text-txt-muted text-center py-8">No conflicting signals</div>
+          <div id="narrative" class="prose prose-invert prose-sm max-w-none text-txt-secondary leading-[1.8] space-y-3">
+          </div>
         </div>
 
-        <div class="col-span-4 card p-6 anim" style="animation-delay:0.3s">
+        <!-- Section: Dashboard -->
+        <div id="section-dashboard" class="scroll-mt-4"></div>
+        <div class="grid grid-cols-12 gap-5 mb-5">
+          <div class="col-span-4 card p-6 anim anim-2">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Today's P&L</span>
+            <div id="pnl-value" class="text-3xl font-bold mono mt-2 mb-1"></div>
+            <div id="pnl-pct" class="text-base font-semibold mono mb-4"></div>
+            <div class="divider mb-4"></div>
+            <div class="grid grid-cols-2 gap-4">
+              <div><span class="text-[10px] text-txt-muted uppercase">Total Value</span>
+                <p id="total-value" class="mono text-sm font-medium mt-1"></p>
+              </div>
+              <div><span class="text-[10px] text-txt-muted uppercase">Type</span>
+                <p id="portfolio-type" class="text-sm font-medium mt-1"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-3 card p-6 anim anim-3 flex flex-col items-center justify-center">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest mb-3">Reasoning Quality</span>
+            <div class="score-container">
+              <svg viewBox="0 0 100 100">
+                <circle class="score-bg" cx="50" cy="50" r="45" />
+                <circle class="score-fg" cx="50" cy="50" r="45" id="score-circle" />
+              </svg>
+              <div class="text-center z-10">
+                <div id="score-grade" class="text-2xl font-black"></div>
+                <div id="score-pct" class="text-[10px] text-txt-muted mono"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-5 card p-6 anim" style="animation-delay:0.1s">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="dot-red"></div>
+              <span class="text-[10px] text-txt-muted uppercase tracking-widest">Key Insight</span>
+            </div>
+            <p id="key-takeaway" class="text-[13px] leading-relaxed text-txt-secondary"></p>
+          </div>
+        </div>
+
+        <!-- Section: Analysis -->
+        <div id="section-analysis" class="scroll-mt-4 pt-2 mb-2">
           <div class="flex items-center gap-2 mb-4">
-            <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Risk Alerts</span>
+            <div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Analysis</span>
           </div>
-          <div id="risk-list" class="space-y-2"></div>
-          <div id="no-risks" class="hidden text-xs text-txt-muted text-center py-8">Portfolio well-balanced</div>
+        </div>
+        <div class="grid grid-cols-12 gap-5 mb-5">
+          <div class="col-span-5 card p-6 anim" style="animation-delay:0.15s">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Holdings Impact</span>
+            <div id="holdings-list" class="mt-4 space-y-1 max-h-[300px] overflow-y-auto"></div>
+          </div>
+
+          <div class="col-span-7 card p-6 anim" style="animation-delay:0.2s">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-[10px] text-txt-muted uppercase tracking-widest">Causal Analysis</span>
+              <div class="flex gap-1" id="chain-tabs"></div>
+            </div>
+            <div id="chain-content"></div>
+          </div>
         </div>
 
-        <div class="col-span-4 card p-6 anim" style="animation-delay:0.35s">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Evaluation Breakdown</span>
-          <div id="eval-bars" class="mt-4 space-y-3"></div>
+        <!-- Section: Reasoning -->
+        <div id="section-reasoning" class="scroll-mt-4 pt-2 mb-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Reasoning &amp; Risk</span>
+          </div>
         </div>
+        <div class="grid grid-cols-12 gap-5 mb-5">
+          <div class="col-span-4 card p-6 anim" style="animation-delay:0.25s">
+            <div class="flex items-center gap-2 mb-4">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <span class="text-[10px] text-txt-muted uppercase tracking-widest">Conflicting Signals</span>
+            </div>
+            <div id="conflicts-list" class="space-y-3"></div>
+            <div id="no-conflicts" class="hidden text-xs text-txt-muted text-center py-8">No conflicting signals</div>
+          </div>
+
+          <div class="col-span-4 card p-6 anim" style="animation-delay:0.3s">
+            <div class="flex items-center gap-2 mb-4">
+              <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span class="text-[10px] text-txt-muted uppercase tracking-widest">Risk Alerts</span>
+            </div>
+            <div id="risk-list" class="space-y-2"></div>
+            <div id="no-risks" class="hidden text-xs text-txt-muted text-center py-8">Portfolio well-balanced</div>
+          </div>
+
+          <div class="col-span-4 card p-6 anim" style="animation-delay:0.35s">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Evaluation Breakdown</span>
+            <div id="eval-bars" class="mt-4 space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- Section: Trace -->
+        <div id="section-trace" class="scroll-mt-4 pt-2 mb-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="dot-red"></div><span class="text-xs font-semibold tracking-wide">Trace &amp;
+              Observability</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-5 mb-8">
+          <div class="col-span-7 card p-6 anim" style="animation-delay:0.4s">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Sector Performance</span>
+            <div class="mt-4"><canvas id="sector-chart" height="200"></canvas></div>
+          </div>
+
+          <div class="col-span-5 card p-6 anim" style="animation-delay:0.45s">
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Trace &amp; Observability</span>
+            <div id="trace-info" class="mt-4"></div>
+            <div class="divider my-4"></div>
+            <span class="text-[10px] text-txt-muted uppercase tracking-widest">Pipeline</span>
+            <div id="pipeline-stages" class="mt-3 space-y-2"></div>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Section: Trace -->
-      <div id="section-trace" class="scroll-mt-4 pt-2 mb-2">
-        <div class="flex items-center gap-2 mb-4"><div class="dot-emerald"></div><span class="text-xs font-semibold tracking-wide">Trace &amp; Observability</span></div>
+      <!-- Footer -->
+      <div class="text-center py-6 border-t border-bg-border">
+        <p class="text-[11px] text-txt-muted">Hybrid AI &middot; Deterministic Causal Logic &middot; Dynamic LLM
+          Generation &middot; Built for autonomous financial intelligence</p>
       </div>
-      <div class="grid grid-cols-12 gap-5 mb-8">
-        <div class="col-span-7 card p-6 anim" style="animation-delay:0.4s">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Sector Performance</span>
-          <div class="mt-4"><canvas id="sector-chart" height="200"></canvas></div>
-        </div>
-
-        <div class="col-span-5 card p-6 anim" style="animation-delay:0.45s">
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Trace &amp; Observability</span>
-          <div id="trace-info" class="mt-4"></div>
-          <div class="divider my-4"></div>
-          <span class="text-[10px] text-txt-muted uppercase tracking-widest">Pipeline</span>
-          <div id="pipeline-stages" class="mt-3 space-y-2"></div>
-        </div>
-      </div>
-
     </div>
+  </main>
 
-    <!-- Footer -->
-    <div class="text-center py-6 border-t border-bg-border">
-      <p class="text-[11px] text-txt-muted">Hybrid AI &middot; Deterministic Causal Logic &middot; Dynamic LLM Generation &middot; Built for autonomous financial intelligence</p>
-    </div>
-  </div>
-</main>
+  <script>
+    const fmt = (n) => new Intl.NumberFormat('en-IN').format(Math.round(n));
+    const fmtCr = (n) => '\u20B9' + fmt(n);
+    let sectorChart = null;
 
-<script>
-const fmt = (n) => new Intl.NumberFormat('en-IN').format(Math.round(n));
-const fmtCr = (n) => '\u20B9' + fmt(n);
-let sectorChart = null;
+    async function init() {
+      const [portfolios, market] = await Promise.all([
+        fetch('/api/portfolios').then(r => r.json()),
+        fetch('/api/market').then(r => r.json()),
+      ]);
+      renderTicker(market);
+      renderPortfolioCards(portfolios);
+      await loadPortfolio('PORTFOLIO_001');
+    }
 
-let globalPortfolios = {};
+    function renderTicker(market) {
+      const row = document.getElementById('indices-row');
+      row.innerHTML = '';
+      const entries = Object.entries(market.indices);
+      entries.forEach(([key, idx], i) => {
+        const neg = idx.change_percent < 0;
+        row.innerHTML += '<div class="flex items-center gap-3 flex-shrink-0">' +
+          '<div><div class="text-[10px] text-txt-muted uppercase">' + idx.name + '</div>' +
+          '<div class="mono text-sm font-semibold">' + fmt(idx.current_value) + '</div></div>' +
+          '<div class="mono text-sm font-semibold ' + (neg ? 'text-red-400' : 'text-emerald-400') + '">' +
+          (neg ? '' : '+') + idx.change_percent.toFixed(2) + '%</div></div>' +
+          (i < entries.length - 1 ? '<div class="w-px h-6 bg-bg-border"></div>' : '');
+      });
+    }
 
-async function init() {
-  const [portfolios, market] = await Promise.all([
-    fetch('/api/portfolios').then(r => r.json()),
-    fetch('/api/market').then(r => r.json()),
-  ]);
-  globalPortfolios = portfolios;
-  renderTicker(market);
-  renderPortfolioCards(portfolios);
-  await loadPortfolio('PORTFOLIO_001');
-}
+    function renderPortfolioCards(portfolios) {
+      ['PORTFOLIO_001', 'PORTFOLIO_002', 'PORTFOLIO_003'].forEach((id, i) => {
+        const p = portfolios[id]; if (!p) return;
+        const n = i + 1;
+        document.getElementById('p' + n + '-name').textContent = p.user_name;
+        document.getElementById('p' + n + '-desc').textContent = (p.description || '').substring(0, 45) + '...';
+        document.getElementById('p' + n + '-value').textContent = fmtCr(p.current_value);
+        document.getElementById('p' + n + '-risk').textContent = p.risk_profile;
+      });
+    }
 
-function updateAccentColor(risk) {
-  const root = document.documentElement;
-  const r = risk.toUpperCase();
-  if (r === 'AGGRESSIVE') {
-    root.style.setProperty('--accent-primary', '#ef4444');
-    root.style.setProperty('--accent-primary-light', '#f87171');
-    root.style.setProperty('--accent-primary-glow', 'rgba(239, 68, 68, 0.15)');
-  } else if (r === 'MODERATE') {
-    root.style.setProperty('--accent-primary', '#10b981');
-    root.style.setProperty('--accent-primary-light', '#34d399');
-    root.style.setProperty('--accent-primary-glow', 'rgba(16, 185, 129, 0.15)');
-  } else {
-    // CONSERVATIVE
-    root.style.setProperty('--accent-primary', '#0ea5e9');
-    root.style.setProperty('--accent-primary-light', '#38bdf8');
-    root.style.setProperty('--accent-primary-glow', 'rgba(14, 165, 233, 0.15)');
-  }
-}
+    function selectPortfolio(id, el) {
+      document.querySelectorAll('.port-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      loadPortfolio(id);
+    }
 
-function renderTicker(market) {
-  const row = document.getElementById('indices-row');
-  row.innerHTML = '';
-  const entries = Object.entries(market.indices);
-  entries.forEach(([key, idx], i) => {
-    const neg = idx.change_percent < 0;
-    row.innerHTML += '<div class="flex items-center gap-3 flex-shrink-0">' +
-      '<div><div class="text-[10px] text-txt-muted uppercase">' + idx.name + '</div>' +
-      '<div class="mono text-sm font-semibold">' + fmt(idx.current_value) + '</div></div>' +
-      '<div class="mono text-sm font-semibold ' + (neg ? 'text-red-400' : 'text-emerald-400') + '">' +
-      (neg ? '' : '+') + idx.change_percent.toFixed(2) + '%</div></div>' +
-      (i < entries.length - 1 ? '<div class="w-px h-6 bg-bg-border"></div>' : '');
-  });
-}
-
-function renderPortfolioCards(portfolios) {
-  ['PORTFOLIO_001','PORTFOLIO_002','PORTFOLIO_003'].forEach((id, i) => {
-    const p = portfolios[id]; if (!p) return;
-    const n = i + 1;
-    document.getElementById('p'+n+'-name').textContent = p.user_name;
-    document.getElementById('p'+n+'-desc').textContent = (p.description || '').substring(0, 45) + '...';
-    document.getElementById('p'+n+'-value').textContent = fmtCr(p.current_value);
-    document.getElementById('p'+n+'-risk').textContent = p.risk_profile;
-  });
-}
-
-function selectPortfolio(id, el) {
-  document.querySelectorAll('.port-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  loadPortfolio(id);
-}
-
-function reloadCurrentPortfolio() {
-  const active = document.querySelector('.port-card.active');
-  if (active) {
-    loadPortfolio(active.dataset.id);
-  }
-}
-
-async function loadPortfolio(id) {
-  const p = globalPortfolios[id];
-  if (p) updateAccentColor(p.risk_profile);
-  
-  const thinkEl = document.getElementById('agent-thinking');
-  const stepsEl = document.getElementById('thinking-steps');
-  const mainEl = document.getElementById('main-content');
-
-  mainEl.classList.add('hidden');
-  thinkEl.classList.remove('hidden');
-  stepsEl.innerHTML = '';
-
-  const steps = [
-    ['Loading market data & news feed', 'data_loading'],
-    ['Classifying 25 news articles by sentiment & scope', 'market_intelligence'],
-    ['Computing portfolio P&L & sector allocation', 'portfolio_analytics'],
-    ['Building causal chains: News → Sector → Stock → Impact', 'reasoning'],
-    ['Resolving conflicting signals', 'conflicts'],
-    ['Self-evaluating reasoning quality', 'evaluation'],
-  ];
-
-  // Start fetch immediately
-  const model = document.getElementById('model-select').value;
-  const fetchPromise = fetch('/api/portfolio/' + id + '?model=' + model).then(r => r.json());
-
-  // Animate steps while waiting
-  for (let i = 0; i < steps.length; i++) {
-    const [label, phase] = steps[i];
-    const stepDiv = document.createElement('div');
-    stepDiv.className = 'flex items-center gap-3 py-1';
-    stepDiv.innerHTML = '<div class="w-4 h-4 flex items-center justify-center"><div class="loader" style="width:14px;height:14px;border-width:1.5px"></div></div>' +
-      '<span class="text-txt-muted">' + label + '</span>';
-    stepsEl.appendChild(stepDiv);
-    await new Promise(r => setTimeout(r, 250 + Math.random() * 200));
-    // Mark done
-    stepDiv.innerHTML = '<div class="w-4 h-4 flex items-center justify-center text-emerald-400"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>' +
-      '<span class="text-txt-primary">' + label + '</span>' +
-      '<span class="text-txt-muted ml-auto">' + Math.floor(Math.random() * 3 + 1) + 'ms</span>';
-  }
-
-  const data = await fetchPromise;
-
-  // Final step
-  const grade = data.evaluation.grade;
-  const finalDiv = document.createElement('div');
-  finalDiv.className = 'flex items-center gap-3 py-2 mt-2 border-t border-bg-border';
-  finalDiv.innerHTML = '<div class="dot-emerald"></div><span class="text-sm font-semibold">Analysis complete — Grade ' + grade + ' (' + Math.round(data.evaluation.overall_score * 100) + '%)</span>';
-  stepsEl.appendChild(finalDiv);
-
-  await new Promise(r => setTimeout(r, 600));
-
-  thinkEl.classList.add('hidden');
-  mainEl.classList.remove('hidden');
-  renderBriefing(data);
-}
-
-function renderBriefing(data) {
-  const b = data.briefing, e = data.evaluation, t = data.trace;
-
-  // P&L
-  const pnlMatch = b.portfolio_pnl.match(/Rs([\d,.-]+)/);
-  const pnlNum = pnlMatch ? parseFloat(pnlMatch[1].replace(/,/g, '')) : 0;
-  const isLoss = b.portfolio_pnl.includes('Rs-') || b.portfolio_pnl.includes('Rs -');
-  const pnlEl = document.getElementById('pnl-value');
-  pnlEl.textContent = (isLoss ? '-' : '') + '\u20B9' + fmt(Math.abs(pnlNum));
-  pnlEl.className = 'text-3xl font-bold mono mt-2 mb-1 ' + (isLoss ? 'text-accent-red' : 'text-accent-primary');
-
-  const pctMatch = b.portfolio_pnl.match(/([-+]?\d+\.\d+)%/);
-  const pct = pctMatch ? parseFloat(pctMatch[1]) : 0;
-  const pctEl = document.getElementById('pnl-pct');
-  pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% today';
-  pctEl.className = 'text-base font-semibold mono mb-4 ' + (pct < 0 ? 'text-accent-red' : 'text-accent-primary');
-
-  const tvMatch = b.portfolio_pnl.match(/Total value: Rs([\d,]+)/);
-  document.getElementById('total-value').textContent = tvMatch ? '\u20B9' + tvMatch[1] : '';
-  document.getElementById('portfolio-type').textContent = b.portfolio_type;
-
-  // Score
-  const score = e.overall_score, grade = e.grade;
-  document.getElementById('score-grade').textContent = grade;
-  document.getElementById('score-pct').textContent = Math.round(score * 100) + '%';
-  const circ = document.getElementById('score-circle');
-  circ.style.strokeDashoffset = 283 * (1 - score);
-  const gc = {A:'#10b981',B:'#34d399',C:'#f59e0b',D:'#ef4444',F:'#ef4444'};
-  circ.style.stroke = gc[grade] || '#c0392b';
-  document.getElementById('score-grade').style.color = gc[grade] || '#c0392b';
-
-  document.getElementById('key-takeaway').textContent = b.key_takeaway;
-
-  // Narrative
-  const narrativeEl = document.getElementById('narrative');
-  if (b.narrative) {
-    narrativeEl.innerHTML = marked.parse(b.narrative);
-  } else {
-    narrativeEl.innerHTML = '<p>' + b.key_takeaway + '</p>';
-  }
-
-  renderHoldings(b);
-  renderChains(b.causal_chains);
-  renderConflicts(b.conflicts);
-  renderRisks(b.risk_alerts);
-  renderEvalBars(e.dimensions);
-  renderSectorChart();
-  renderTrace(t);
-}
-
-function renderHoldings(b) {
-  const list = document.getElementById('holdings-list');
-  const holdings = [];
-  const seen = new Set();
-  for (const chain of b.causal_chains) {
-    for (const step of chain.chain) {
-      const m = step.match(/(\w+) moved ([+-]?\d+\.\d+)% \(weight: ([\d.]+)%\)/);
-      if (m && !seen.has(m[1])) {
-        seen.add(m[1]);
-        holdings.push({symbol: m[1], change: parseFloat(m[2]), weight: parseFloat(m[3])});
+    function reloadCurrentPortfolio() {
+      const active = document.querySelector('.port-card.active');
+      if (active) {
+        loadPortfolio(active.dataset.id);
       }
     }
-  }
-  holdings.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
-  list.innerHTML = holdings.map(h => {
-    const neg = h.change < 0;
-    const w = Math.min(Math.abs(h.change) * 18, 100);
-    return '<div class="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-bg-hover transition-colors">' +
-      '<div class="w-16"><div class="text-xs font-semibold">' + h.symbol + '</div><div class="text-[10px] text-txt-muted">' + h.weight + '%</div></div>' +
-      '<div class="flex-1"><div class="bar-track"><div class="bar-fill ' + (neg ? 'bg-red-500/50' : 'bg-emerald-500/50') + '" style="width:' + w + '%;' + (neg ? 'float:right' : '') + '"></div></div></div>' +
-      '<div class="mono text-xs font-semibold w-14 text-right ' + (neg ? 'text-red-400' : 'text-emerald-400') + '">' + (neg ? '' : '+') + h.change.toFixed(2) + '%</div></div>';
-  }).join('');
-}
 
-function renderChains(chains) {
-  const tabs = document.getElementById('chain-tabs');
-  const content = document.getElementById('chain-content');
-  window._chains = chains;
-  tabs.innerHTML = chains.map((c, i) =>
-    '<button onclick="showChain(' + i + ')" class="tab-btn' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '">Chain ' + (i+1) + '</button>'
-  ).join('');
-  if (chains.length > 0) showChain(0);
-  else content.innerHTML = '<p class="text-xs text-txt-muted text-center py-8">No causal chains</p>';
-}
+    async function loadPortfolio(id) {
+      const thinkEl = document.getElementById('agent-thinking');
+      const stepsEl = document.getElementById('thinking-steps');
+      const mainEl = document.getElementById('main-content');
 
-function showChain(idx) {
-  document.querySelectorAll('.tab-btn').forEach((t, i) => t.classList.toggle('active', i === idx));
-  const chain = window._chains[idx];
-  const content = document.getElementById('chain-content');
-  const cc = chain.confidence >= 0.8 ? 'text-emerald-400' : chain.confidence >= 0.5 ? 'text-amber-400' : 'text-red-400';
-  const cb = chain.confidence >= 0.8 ? 'bg-emerald-500' : chain.confidence >= 0.5 ? 'bg-amber-500' : 'bg-red-500';
-  content.innerHTML =
-    '<div class="flex items-center justify-between mb-4">' +
-      '<div class="flex items-center gap-2"><span class="text-[10px] text-txt-muted uppercase">Confidence</span><span class="mono text-sm font-bold ' + cc + '">' + Math.round(chain.confidence * 100) + '%</span></div>' +
-      '<div class="bar-track w-28"><div class="bar-fill ' + cb + '" style="width:' + (chain.confidence * 100) + '%"></div></div></div>' +
-    '<div class="chain-track">' +
-      chain.chain.map((step, i) =>
-        '<div class="chain-step" style="animation-delay:' + (i * 0.08) + 's"><div class="text-[13px] ' + (i === 0 ? 'text-txt-primary font-medium' : 'text-txt-secondary') + '">' + step + '</div></div>'
-      ).join('') +
-      '<div class="chain-step" style="animation-delay:' + (chain.chain.length * 0.08) + 's"><div class="text-[13px] font-semibold text-accent-primary">' + chain.impact + '</div></div>' +
-    '</div>' +
-    '<div class="mt-3 flex flex-wrap gap-1.5">' +
-      chain.affected.map(s => '<span class="px-2 py-0.5 rounded-md bg-bg-hover border border-bg-border text-[10px] text-txt-secondary font-medium">' + s + '</span>').join('') +
-    '</div>';
-}
+      mainEl.classList.add('hidden');
+      thinkEl.classList.remove('hidden');
+      stepsEl.innerHTML = '';
 
-function renderConflicts(conflicts) {
-  const list = document.getElementById('conflicts-list');
-  const noEl = document.getElementById('no-conflicts');
-  if (!conflicts.length) { list.innerHTML = ''; noEl.classList.remove('hidden'); return; }
-  noEl.classList.add('hidden');
-  list.innerHTML = conflicts.map(c => {
-    const col = c.assessment === 'POSITIVE' ? 'emerald' : c.assessment === 'NEGATIVE' ? 'red' : 'amber';
-    return '<div class="p-3 rounded-lg border border-bg-border">' +
-      '<div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold">' + c.symbol + '</span>' +
-      '<span class="badge-sm bg-' + col + '-500/10 text-' + col + '-400">' + c.assessment + '</span></div>' +
-      '<p class="text-[11px] text-txt-muted leading-relaxed">' + c.resolution + '</p></div>';
-  }).join('');
-}
+      const steps = [
+        ['Loading market data & news feed', 'data_loading'],
+        ['Classifying 25 news articles by sentiment & scope', 'market_intelligence'],
+        ['Computing portfolio P&L & sector allocation', 'portfolio_analytics'],
+        ['Building causal chains: News → Sector → Stock → Impact', 'reasoning'],
+        ['Resolving conflicting signals', 'conflicts'],
+        ['Self-evaluating reasoning quality', 'evaluation'],
+      ];
 
-function renderRisks(risks) {
-  const list = document.getElementById('risk-list');
-  const noEl = document.getElementById('no-risks');
-  if (!risks.length) { list.innerHTML = ''; noEl.classList.remove('hidden'); return; }
-  noEl.classList.add('hidden');
-  list.innerHTML = risks.map(r => {
-    const crit = r.toLowerCase().includes('concentration') || r.toLowerCase().includes('single stock');
-    return '<div class="p-3 rounded-lg border-l-2 ' + (crit ? 'border-l-accent-red bg-accent-red/5' : 'border-l-accent-gold bg-accent-gold/5') + '">' +
-      '<p class="text-[11px] font-medium">' + r + '</p></div>';
-  }).join('');
-}
+      // Start fetch immediately
+      const model = document.getElementById('model-select').value;
+      const fetchPromise = fetch('/api/portfolio/' + id + '?model=' + model).then(r => r.json());
 
-function renderEvalBars(dims) {
-  const el = document.getElementById('eval-bars');
-  const colors = {causal_depth:'bg-accent-primary',coverage:'bg-accent-primary',conflict_handling:'bg-accent-gold',risk_identification:'bg-accent-red',confidence_calibration:'bg-accent-gold',conciseness:'bg-accent-primary'};
-  const labels = {causal_depth:'Causal Depth',coverage:'Coverage',conflict_handling:'Conflicts',risk_identification:'Risk Detection',confidence_calibration:'Calibration',conciseness:'Conciseness'};
-  el.innerHTML = dims.map(d =>
-    '<div><div class="flex justify-between mb-1"><span class="text-[10px] text-txt-muted">' + (labels[d.name]||d.name) + '</span><span class="mono text-[10px] font-semibold">' + Math.round(d.score*100) + '%</span></div>' +
-    '<div class="bar-track"><div class="bar-fill ' + (colors[d.name]||'bg-accent-primary') + '" style="width:' + (d.score*100) + '%"></div></div></div>'
-  ).join('');
-}
+      // Animate steps while waiting
+      for (let i = 0; i < steps.length; i++) {
+        const [label, phase] = steps[i];
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'flex items-center gap-3 py-1';
+        stepDiv.innerHTML = '<div class="w-4 h-4 flex items-center justify-center"><div class="loader" style="width:14px;height:14px;border-width:1.5px"></div></div>' +
+          '<span class="text-txt-muted">' + label + '</span>';
+        stepsEl.appendChild(stepDiv);
+        await new Promise(r => setTimeout(r, 250 + Math.random() * 200));
+        // Mark done
+        stepDiv.innerHTML = '<div class="w-4 h-4 flex items-center justify-center text-emerald-400"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>' +
+          '<span class="text-txt-primary">' + label + '</span>' +
+          '<span class="text-txt-muted ml-auto">' + Math.floor(Math.random() * 3 + 1) + 'ms</span>';
+      }
 
-async function renderSectorChart() {
-  const market = await fetch('/api/market').then(r => r.json());
-  const sectors = market.sector_performance;
-  const entries = Object.entries(sectors).sort((a,b) => b[1].change_percent - a[1].change_percent);
-  const labels = entries.map(([s]) => s.replace('INFORMATION_TECHNOLOGY','IT').replace('FINANCIAL_SERVICES','FIN SVC').replace('INFRASTRUCTURE','INFRA').replace('PHARMACEUTICALS','PHARMA').replace('AUTOMOBILE','AUTO'));
-  const values = entries.map(([,s]) => s.change_percent);
+      const data = await fetchPromise;
 
-  // Split into gainers and losers for dual-area effect
-  const gainers = values.map(v => v >= 0 ? v : null);
-  const losers = values.map(v => v < 0 ? v : null);
+      // Final step
+      const grade = data.evaluation.grade;
+      const finalDiv = document.createElement('div');
+      finalDiv.className = 'flex items-center gap-3 py-2 mt-2 border-t border-bg-border';
+      finalDiv.innerHTML = '<div class="dot-red"></div><span class="text-sm font-semibold">Analysis complete — Grade ' + grade + ' (' + Math.round(data.evaluation.overall_score * 100) + '%)</span>';
+      stepsEl.appendChild(finalDiv);
 
-  if (sectorChart) sectorChart.destroy();
-  const ctx = document.getElementById('sector-chart').getContext('2d');
+      await new Promise(r => setTimeout(r, 600));
 
-  // Emerald gradient fill (gainers)
-  const emeraldGrad = ctx.createLinearGradient(0, 0, 0, 300);
-  emeraldGrad.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-  emeraldGrad.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
+      thinkEl.classList.add('hidden');
+      mainEl.classList.remove('hidden');
+      renderBriefing(data);
+    }
 
-  // Gold gradient fill (losers)
-  const goldGrad = ctx.createLinearGradient(0, 0, 0, 300);
-  goldGrad.addColorStop(0, 'rgba(251, 191, 36, 0.2)');
-  goldGrad.addColorStop(1, 'rgba(251, 191, 36, 0.01)');
+    function renderBriefing(data) {
+      const b = data.briefing, e = data.evaluation, t = data.trace;
 
-  sectorChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Gainers',
-          data: values.map(v => v >= 0 ? v : 0),
-          borderColor: 'rgba(34,197,94,0.8)',
-          backgroundColor: greenGrad,
-          fill: true,
-          tension: 0.4,
-          borderWidth: 2,
-          pointBackgroundColor: values.map(v => v >= 0 ? '#22c55e' : 'transparent'),
-          pointBorderColor: values.map(v => v >= 0 ? '#22c55e' : 'transparent'),
-          pointRadius: values.map(v => v >= 0 ? 4 : 0),
-          pointHoverRadius: 6,
-        },
-        {
-          label: 'Losers',
-          data: values.map(v => v < 0 ? v : 0),
-          borderColor: 'rgba(192,57,43,0.8)',
-          backgroundColor: redGrad,
-          fill: true,
-          tension: 0.4,
-          borderWidth: 2,
-          pointBackgroundColor: values.map(v => v < 0 ? '#c0392b' : 'transparent'),
-          pointBorderColor: values.map(v => v < 0 ? '#c0392b' : 'transparent'),
-          pointRadius: values.map(v => v < 0 ? 4 : 0),
-          pointHoverRadius: 6,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      interaction: { intersect: false, mode: 'index' },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#10111a',
-          borderColor: '#1a1b27',
-          borderWidth: 1,
-          titleColor: '#e8e8ec',
-          bodyColor: '#8b8b9e',
-          titleFont: { family: 'Inter', size: 11 },
-          bodyFont: { family: 'JetBrains Mono', size: 11 },
-          padding: 10,
-          cornerRadius: 8,
-          callbacks: { label: ctx => ctx.raw !== 0 ? (ctx.raw >= 0 ? '+' : '') + ctx.raw.toFixed(2) + '%' : '' }
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: 'rgba(26,27,39,0.5)', drawTicks: false },
-          ticks: { color: '#55556a', font: { size: 9, family: 'Inter' }, padding: 8 },
-          border: { color: '#1a1b27' }
-        },
-        y: {
-          grid: { color: 'rgba(26,27,39,0.5)', drawTicks: false },
-          ticks: { color: '#55556a', font: { size: 9, family: 'JetBrains Mono' }, padding: 8, callback: v => v + '%' },
-          border: { color: '#1a1b27' }
+      // P&L
+      const pnlMatch = b.portfolio_pnl.match(/Rs([\d,.-]+)/);
+      const pnlNum = pnlMatch ? parseFloat(pnlMatch[1].replace(/,/g, '')) : 0;
+      const isLoss = b.portfolio_pnl.includes('Rs-') || b.portfolio_pnl.includes('Rs -');
+      const pnlEl = document.getElementById('pnl-value');
+      pnlEl.textContent = (isLoss ? '-' : '') + '\u20B9' + fmt(Math.abs(pnlNum));
+      pnlEl.className = 'text-3xl font-bold mono mt-2 mb-1 ' + (isLoss ? 'text-red-400' : 'text-emerald-400');
+
+      const pctMatch = b.portfolio_pnl.match(/([-+]?\d+\.\d+)%/);
+      const pct = pctMatch ? parseFloat(pctMatch[1]) : 0;
+      const pctEl = document.getElementById('pnl-pct');
+      pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% today';
+      pctEl.className = 'text-base font-semibold mono mb-4 ' + (pct < 0 ? 'text-red-400' : 'text-emerald-400');
+
+      const tvMatch = b.portfolio_pnl.match(/Total value: Rs([\d,]+)/);
+      document.getElementById('total-value').textContent = tvMatch ? '\u20B9' + tvMatch[1] : '';
+      document.getElementById('portfolio-type').textContent = b.portfolio_type;
+
+      // Score
+      const score = e.overall_score, grade = e.grade;
+      document.getElementById('score-grade').textContent = grade;
+      document.getElementById('score-pct').textContent = Math.round(score * 100) + '%';
+      const circ = document.getElementById('score-circle');
+      circ.style.strokeDashoffset = 283 * (1 - score);
+      const gc = { A: '#22c55e', B: '#3b82f6', C: '#f59e0b', D: '#ef4444', F: '#ef4444' };
+      circ.style.stroke = gc[grade] || '#c0392b';
+      document.getElementById('score-grade').style.color = gc[grade] || '#c0392b';
+
+      document.getElementById('key-takeaway').textContent = b.key_takeaway;
+
+      // Narrative
+      const narrativeEl = document.getElementById('narrative');
+      if (b.narrative) {
+        narrativeEl.innerHTML = marked.parse(b.narrative);
+      } else {
+        narrativeEl.innerHTML = '<p>' + b.key_takeaway + '</p>';
+      }
+
+      renderHoldings(b);
+      renderChains(b.causal_chains);
+      renderConflicts(b.conflicts);
+      renderRisks(b.risk_alerts);
+      renderEvalBars(e.dimensions);
+      renderSectorChart();
+      renderTrace(t);
+    }
+
+    function renderHoldings(b) {
+      const list = document.getElementById('holdings-list');
+      const holdings = [];
+      const seen = new Set();
+      for (const chain of b.causal_chains) {
+        for (const step of chain.chain) {
+          const m = step.match(/(\w+) moved ([+-]?\d+\.\d+)% \(weight: ([\d.]+)%\)/);
+          if (m && !seen.has(m[1])) {
+            seen.add(m[1]);
+            holdings.push({ symbol: m[1], change: parseFloat(m[2]), weight: parseFloat(m[3]) });
+          }
         }
       }
+      holdings.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
+      list.innerHTML = holdings.map(h => {
+        const neg = h.change < 0;
+        const w = Math.min(Math.abs(h.change) * 18, 100);
+        return '<div class="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-bg-hover transition-colors">' +
+          '<div class="w-16"><div class="text-xs font-semibold">' + h.symbol + '</div><div class="text-[10px] text-txt-muted">' + h.weight + '%</div></div>' +
+          '<div class="flex-1"><div class="bar-track"><div class="bar-fill ' + (neg ? 'bg-red-500/50' : 'bg-emerald-500/50') + '" style="width:' + w + '%;' + (neg ? 'float:right' : '') + '"></div></div></div>' +
+          '<div class="mono text-xs font-semibold w-14 text-right ' + (neg ? 'text-red-400' : 'text-emerald-400') + '">' + (neg ? '' : '+') + h.change.toFixed(2) + '%</div></div>';
+      }).join('');
     }
-  });
-}
 
-function renderTrace(trace) {
-  document.getElementById('trace-info').innerHTML =
-    '<div class="grid grid-cols-3 gap-3">' +
-    '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-accent-primary">' + trace.total_spans + '</div><div class="text-[9px] text-txt-muted uppercase">Spans</div></div>' +
-    '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-emerald-400">' + trace.total_duration_ms + 'ms</div><div class="text-[9px] text-txt-muted uppercase">Latency</div></div>' +
-    '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-purple-400">' + trace.token_usage.total + '</div><div class="text-[9px] text-txt-muted uppercase">Tokens</div></div></div>';
-  const sc = ['bg-accent-primary','bg-accent-gold','bg-emerald-500','bg-purple-500','bg-accent-red'];
-  document.getElementById('pipeline-stages').innerHTML = trace.spans.map((s, i) =>
-    '<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full ' + sc[i%sc.length] + '"></div>' +
-    '<span class="text-[11px] text-txt-muted flex-1">' + s.name.replace(/_/g,' ') + '</span>' +
-    '<span class="mono text-[10px] text-txt-muted">' + s.duration_ms + 'ms</span>' +
-    '<span class="text-[9px] ' + (s.status==='OK' ? 'text-emerald-500' : 'text-red-400') + '">' + s.status + '</span></div>'
-  ).join('');
-}
-
-// About modal
-function toggleAbout() {
-  const modal = document.getElementById('about-modal');
-  modal.classList.toggle('hidden');
-}
-
-// Sidebar scroll navigation
-document.querySelectorAll('.sidebar-icon[data-section]').forEach(icon => {
-  icon.addEventListener('click', () => {
-    const section = icon.dataset.section;
-    if (section === 'dashboard') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      const el = document.getElementById('section-' + section);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function renderChains(chains) {
+      const tabs = document.getElementById('chain-tabs');
+      const content = document.getElementById('chain-content');
+      window._chains = chains;
+      tabs.innerHTML = chains.map((c, i) =>
+        '<button onclick="showChain(' + i + ')" class="tab-btn' + (i === 0 ? ' active' : '') + '" data-idx="' + i + '">Chain ' + (i + 1) + '</button>'
+      ).join('');
+      if (chains.length > 0) showChain(0);
+      else content.innerHTML = '<p class="text-xs text-txt-muted text-center py-8">No causal chains</p>';
     }
-    // Update active state
-    document.querySelectorAll('.sidebar-icon[data-section]').forEach(i => i.classList.remove('active'));
-    icon.classList.add('active');
-  });
-});
 
-// Track scroll position to update active sidebar icon
-const mainEl = document.querySelector('.main');
-window.addEventListener('scroll', () => {
-  const sections = ['dashboard', 'analysis', 'reasoning', 'trace'];
-  let current = 'dashboard';
-  for (const s of sections) {
-    const el = document.getElementById('section-' + s);
-    if (el && el.getBoundingClientRect().top <= 120) {
-      current = s;
+    function showChain(idx) {
+      document.querySelectorAll('.tab-btn').forEach((t, i) => t.classList.toggle('active', i === idx));
+      const chain = window._chains[idx];
+      const content = document.getElementById('chain-content');
+      const cc = chain.confidence >= 0.8 ? 'text-emerald-400' : chain.confidence >= 0.5 ? 'text-amber-400' : 'text-red-400';
+      const cb = chain.confidence >= 0.8 ? 'bg-emerald-500' : chain.confidence >= 0.5 ? 'bg-amber-500' : 'bg-red-500';
+      content.innerHTML =
+        '<div class="flex items-center justify-between mb-4">' +
+        '<div class="flex items-center gap-2"><span class="text-[10px] text-txt-muted uppercase">Confidence</span><span class="mono text-sm font-bold ' + cc + '">' + Math.round(chain.confidence * 100) + '%</span></div>' +
+        '<div class="bar-track w-28"><div class="bar-fill ' + cb + '" style="width:' + (chain.confidence * 100) + '%"></div></div></div>' +
+        '<div class="chain-track">' +
+        chain.chain.map((step, i) =>
+          '<div class="chain-step" style="animation-delay:' + (i * 0.08) + 's"><div class="text-[13px] ' + (i === 0 ? 'text-txt-primary font-medium' : 'text-txt-secondary') + '">' + step + '</div></div>'
+        ).join('') +
+        '<div class="chain-step" style="animation-delay:' + (chain.chain.length * 0.08) + 's"><div class="text-[13px] font-semibold text-accent-red">' + chain.impact + '</div></div>' +
+        '</div>' +
+        '<div class="mt-3 flex flex-wrap gap-1.5">' +
+        chain.affected.map(s => '<span class="px-2 py-0.5 rounded-md bg-bg-hover border border-bg-border text-[10px] text-txt-secondary font-medium">' + s + '</span>').join('') +
+        '</div>';
     }
-  }
-  document.querySelectorAll('.sidebar-icon[data-section]').forEach(i => {
-    i.classList.toggle('active', i.dataset.section === current);
-  });
-});
 
-init();
-</script>
+    function renderConflicts(conflicts) {
+      const list = document.getElementById('conflicts-list');
+      const noEl = document.getElementById('no-conflicts');
+      if (!conflicts.length) { list.innerHTML = ''; noEl.classList.remove('hidden'); return; }
+      noEl.classList.add('hidden');
+      list.innerHTML = conflicts.map(c => {
+        const col = c.assessment === 'POSITIVE' ? 'emerald' : c.assessment === 'NEGATIVE' ? 'red' : 'amber';
+        return '<div class="p-3 rounded-lg border border-bg-border">' +
+          '<div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold">' + c.symbol + '</span>' +
+          '<span class="badge-sm bg-' + col + '-500/10 text-' + col + '-400">' + c.assessment + '</span></div>' +
+          '<p class="text-[11px] text-txt-muted leading-relaxed">' + c.resolution + '</p></div>';
+      }).join('');
+    }
+
+    function renderRisks(risks) {
+      const list = document.getElementById('risk-list');
+      const noEl = document.getElementById('no-risks');
+      if (!risks.length) { list.innerHTML = ''; noEl.classList.remove('hidden'); return; }
+      noEl.classList.add('hidden');
+      list.innerHTML = risks.map(r => {
+        const crit = r.toLowerCase().includes('concentration') || r.toLowerCase().includes('single stock');
+        return '<div class="p-3 rounded-lg border-l-2 ' + (crit ? 'border-l-red-500 bg-red-500/5' : 'border-l-amber-500 bg-amber-500/5') + '">' +
+          '<p class="text-[11px] font-medium">' + r + '</p></div>';
+      }).join('');
+    }
+
+    function renderEvalBars(dims) {
+      const el = document.getElementById('eval-bars');
+      const colors = { causal_depth: 'bg-accent-red', coverage: 'bg-emerald-500', conflict_handling: 'bg-amber-500', risk_identification: 'bg-red-500', confidence_calibration: 'bg-purple-500', conciseness: 'bg-blue-500' };
+      const labels = { causal_depth: 'Causal Depth', coverage: 'Coverage', conflict_handling: 'Conflicts', risk_identification: 'Risk Detection', confidence_calibration: 'Calibration', conciseness: 'Conciseness' };
+      el.innerHTML = dims.map(d =>
+        '<div><div class="flex justify-between mb-1"><span class="text-[10px] text-txt-muted">' + (labels[d.name] || d.name) + '</span><span class="mono text-[10px] font-semibold">' + Math.round(d.score * 100) + '%</span></div>' +
+        '<div class="bar-track"><div class="bar-fill ' + (colors[d.name] || 'bg-accent-red') + '" style="width:' + (d.score * 100) + '%"></div></div></div>'
+      ).join('');
+    }
+
+    async function renderSectorChart() {
+      const market = await fetch('/api/market').then(r => r.json());
+      const sectors = market.sector_performance;
+      const entries = Object.entries(sectors).sort((a, b) => b[1].change_percent - a[1].change_percent);
+      const labels = entries.map(([s]) => s.replace('INFORMATION_TECHNOLOGY', 'IT').replace('FINANCIAL_SERVICES', 'FIN SVC').replace('INFRASTRUCTURE', 'INFRA').replace('PHARMACEUTICALS', 'PHARMA').replace('AUTOMOBILE', 'AUTO'));
+      const values = entries.map(([, s]) => s.change_percent);
+
+      // Split into gainers and losers for dual-area effect
+      const gainers = values.map(v => v >= 0 ? v : null);
+      const losers = values.map(v => v < 0 ? v : null);
+
+      if (sectorChart) sectorChart.destroy();
+      const ctx = document.getElementById('sector-chart').getContext('2d');
+
+      // Red gradient fill (losers)
+      const redGrad = ctx.createLinearGradient(0, 0, 0, 300);
+      redGrad.addColorStop(0, 'rgba(192,57,43,0.35)');
+      redGrad.addColorStop(1, 'rgba(192,57,43,0.02)');
+
+      // Green gradient fill (gainers)
+      const greenGrad = ctx.createLinearGradient(0, 0, 0, 300);
+      greenGrad.addColorStop(0, 'rgba(34,197,94,0.03)');
+      greenGrad.addColorStop(1, 'rgba(34,197,94,0.25)');
+
+      sectorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Gainers',
+              data: values.map(v => v >= 0 ? v : 0),
+              borderColor: 'rgba(34,197,94,0.8)',
+              backgroundColor: greenGrad,
+              fill: true,
+              tension: 0.4,
+              borderWidth: 2,
+              pointBackgroundColor: values.map(v => v >= 0 ? '#22c55e' : 'transparent'),
+              pointBorderColor: values.map(v => v >= 0 ? '#22c55e' : 'transparent'),
+              pointRadius: values.map(v => v >= 0 ? 4 : 0),
+              pointHoverRadius: 6,
+            },
+            {
+              label: 'Losers',
+              data: values.map(v => v < 0 ? v : 0),
+              borderColor: 'rgba(192,57,43,0.8)',
+              backgroundColor: redGrad,
+              fill: true,
+              tension: 0.4,
+              borderWidth: 2,
+              pointBackgroundColor: values.map(v => v < 0 ? '#c0392b' : 'transparent'),
+              pointBorderColor: values.map(v => v < 0 ? '#c0392b' : 'transparent'),
+              pointRadius: values.map(v => v < 0 ? 4 : 0),
+              pointHoverRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#10111a',
+              borderColor: '#1a1b27',
+              borderWidth: 1,
+              titleColor: '#e8e8ec',
+              bodyColor: '#8b8b9e',
+              titleFont: { family: 'Inter', size: 11 },
+              bodyFont: { family: 'JetBrains Mono', size: 11 },
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: { label: ctx => ctx.raw !== 0 ? (ctx.raw >= 0 ? '+' : '') + ctx.raw.toFixed(2) + '%' : '' }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(26,27,39,0.5)', drawTicks: false },
+              ticks: { color: '#55556a', font: { size: 9, family: 'Inter' }, padding: 8 },
+              border: { color: '#1a1b27' }
+            },
+            y: {
+              grid: { color: 'rgba(26,27,39,0.5)', drawTicks: false },
+              ticks: { color: '#55556a', font: { size: 9, family: 'JetBrains Mono' }, padding: 8, callback: v => v + '%' },
+              border: { color: '#1a1b27' }
+            }
+          }
+        }
+      });
+    }
+
+    function renderTrace(trace) {
+      document.getElementById('trace-info').innerHTML =
+        '<div class="grid grid-cols-3 gap-3">' +
+        '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-accent-red">' + trace.total_spans + '</div><div class="text-[9px] text-txt-muted uppercase">Spans</div></div>' +
+        '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-emerald-400">' + trace.total_duration_ms + 'ms</div><div class="text-[9px] text-txt-muted uppercase">Latency</div></div>' +
+        '<div class="text-center p-3 rounded-lg bg-bg-hover"><div class="mono text-lg font-bold text-purple-400">' + trace.token_usage.total + '</div><div class="text-[9px] text-txt-muted uppercase">Tokens</div></div></div>';
+      const sc = ['bg-accent-red', 'bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500'];
+      document.getElementById('pipeline-stages').innerHTML = trace.spans.map((s, i) =>
+        '<div class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full ' + sc[i % sc.length] + '"></div>' +
+        '<span class="text-[11px] text-txt-muted flex-1">' + s.name.replace(/_/g, ' ') + '</span>' +
+        '<span class="mono text-[10px] text-txt-muted">' + s.duration_ms + 'ms</span>' +
+        '<span class="text-[9px] ' + (s.status === 'OK' ? 'text-emerald-500' : 'text-red-400') + '">' + s.status + '</span></div>'
+      ).join('');
+    }
+
+    // About modal
+    function toggleAbout() {
+      const modal = document.getElementById('about-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    // Sidebar scroll navigation
+    document.querySelectorAll('.sidebar-icon[data-section]').forEach(icon => {
+      icon.addEventListener('click', () => {
+        const section = icon.dataset.section;
+        if (section === 'dashboard') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const el = document.getElementById('section-' + section);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Update active state
+        document.querySelectorAll('.sidebar-icon[data-section]').forEach(i => i.classList.remove('active'));
+        icon.classList.add('active');
+      });
+    });
+
+    // Track scroll position to update active sidebar icon
+    const mainEl = document.querySelector('.main');
+    window.addEventListener('scroll', () => {
+      const sections = ['dashboard', 'analysis', 'reasoning', 'trace'];
+      let current = 'dashboard';
+      for (const s of sections) {
+        const el = document.getElementById('section-' + s);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = s;
+        }
+      }
+      document.querySelectorAll('.sidebar-icon[data-section]').forEach(i => {
+        i.classList.toggle('active', i.dataset.section === current);
+      });
+    });
+
+    init();
+  </script>
 </body>
+
 </html>
