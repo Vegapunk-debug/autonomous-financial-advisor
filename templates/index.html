@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinAdvisor AI — Autonomous Financial Advisor</title>
+<title>AlphaReason AI — Autonomous Financial Advisor</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
 tailwind.config = {
@@ -25,7 +27,11 @@ tailwind.config = {
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', -apple-system, sans-serif;
-  background: #07080d;
+  background: radial-gradient(circle at 10% 20%, rgba(192, 57, 43, 0.08), transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(41, 128, 185, 0.06), transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(20, 21, 31, 0.5), transparent 60%),
+              #07080d;
+  background-attachment: fixed;
   color: #e8e8ec;
   min-height: 100vh;
   display: flex;
@@ -36,8 +42,10 @@ body {
 .sidebar {
   width: 72px;
   min-height: 100vh;
-  background: #0a0b12;
-  border-right: 1px solid #1a1b27;
+  background: rgba(10, 11, 18, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,7 +69,7 @@ body {
   position: relative;
 }
 .sidebar-icon:hover, .sidebar-icon.active {
-  background: #14151f;
+  background: rgba(255, 255, 255, 0.05);
   color: #e8e8ec;
 }
 .sidebar-icon.active::before {
@@ -84,16 +92,23 @@ body {
 }
 
 /* Main content */
-.main { margin-left: 72px; flex: 1; min-height: 100vh; }
+.main { margin-left: 72px; flex: 1; min-height: 100vh; position: relative; }
 
 /* Cards */
 .card {
-  background: #10111a;
-  border: 1px solid #1a1b27;
+  background: rgba(16, 17, 26, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
   border-radius: 14px;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
 }
-.card:hover { border-color: #252638; }
+.card:hover { 
+  border-color: rgba(255, 255, 255, 0.08); 
+  background: rgba(16, 17, 26, 0.65);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
 .card-flat {
   background: transparent;
   border: 1px solid #1a1b27;
@@ -105,6 +120,11 @@ body {
   cursor: pointer;
   transition: all 0.25s ease;
   position: relative;
+}
+.port-card:hover:not(.active) {
+  transform: translateY(-2px);
+  border-color: #252638;
+  box-shadow: 0 10px 25px -5px rgba(192, 57, 43, 0.1);
 }
 .port-card::before {
   content: '';
@@ -173,6 +193,26 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .anim { animation: fadeIn 0.4s ease-out both; }
+.anim-1 { animation-delay: 0.1s; }
+.anim-2 { animation-delay: 0.2s; }
+.anim-3 { animation-delay: 0.3s; }
+.anim-4 { animation-delay: 0.4s; }
+
+@keyframes skeletonPulse {
+  0% { background-color: #10111a; }
+  50% { background-color: #14151f; }
+  100% { background-color: #10111a; }
+}
+.skeleton {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Markdown Prose Customization */
+.prose ul > li::marker { color: #c0392b; }
+.prose blockquote { border-left-color: #c0392b; color: #8b8b9e; font-style: italic; background: rgba(192,57,43,0.05); padding: 4px 12px; border-radius: 0 4px 4px 0; }
+.prose strong { color: #e8e8ec; font-weight: 600; }
+.prose p { margin-bottom: 0.75em; }
 
 /* Score arc */
 .score-container {
@@ -280,7 +320,7 @@ body {
         <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
       </div>
       <div>
-        <h2 class="text-lg font-bold">FinAdvisor<span class="text-accent-red">AI</span></h2>
+        <h2 class="text-lg font-bold">AlphaReason<span class="text-accent-red">AI</span></h2>
         <p class="text-[11px] text-txt-muted tracking-widest uppercase">Autonomous Reasoning Engine</p>
       </div>
     </div>
@@ -298,7 +338,7 @@ body {
       </div>
       <div>
         <span class="text-[10px] text-txt-muted uppercase tracking-widest">LLM Usage</span>
-        <p class="text-xs text-txt-secondary mt-1">Zero LLM calls. Pure rule-based reasoning. Sub-5ms latency. Deterministic and reproducible.</p>
+        <p class="text-xs text-txt-secondary mt-1">Hybrid Architecture: Deterministic rule-based causal logic + Dynamic Groq LLM narrative generation.</p>
       </div>
       <div>
         <span class="text-[10px] text-txt-muted uppercase tracking-widest">Data</span>
@@ -348,12 +388,17 @@ body {
 <!-- Main Content -->
 <main class="main">
   <!-- Header -->
-  <header class="px-8 py-6 border-b border-bg-border flex items-center justify-between">
+  <header class="px-8 py-6 border-b border-bg-border flex items-center justify-between sticky top-0 z-40 bg-bg-primary/70 backdrop-blur-md">
     <div>
-      <h1 class="text-xl font-bold tracking-tight">FinAdvisor<span class="text-accent-red">AI</span></h1>
+      <h1 class="text-xl font-bold tracking-tight">AlphaReason <span class="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">AI</span></h1>
       <p class="text-[11px] text-txt-muted tracking-widest uppercase mt-0.5">Autonomous Reasoning Engine</p>
     </div>
     <div class="flex items-center gap-5">
+      <select id="model-select" onchange="reloadCurrentPortfolio()" class="bg-bg-secondary border border-bg-border text-txt-secondary text-xs rounded-md px-2 py-1 outline-none cursor-pointer hover:border-txt-muted transition-colors mr-2">
+        <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+        <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+        <option value="gemma2-9b-it">Gemma 2 9B</option>
+      </select>
       <div class="flex items-center gap-2">
         <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
         <span class="text-xs text-txt-secondary">Live</span>
@@ -427,34 +472,42 @@ body {
     </div>
 
     <!-- Agent Thinking -->
-    <div id="agent-thinking" class="hidden card p-6 mb-6">
-      <div class="flex items-center gap-3 mb-5">
-        <div class="loader"></div>
-        <div>
-          <div class="text-sm font-semibold">Agent Reasoning...</div>
-          <div class="text-[11px] text-txt-muted">Analyzing portfolio against market signals</div>
+    <div id="agent-thinking" class="hidden mb-6">
+      <div class="card p-6 border-accent-redGlow border shadow-[0_0_15px_rgba(192,57,43,0.15)]">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="loader"></div>
+          <div>
+            <div class="text-sm font-semibold">Agent Reasoning...</div>
+            <div class="text-[11px] text-txt-muted uppercase tracking-widest">Querying LLM Engine</div>
+          </div>
+        </div>
+        <div id="thinking-steps" class="space-y-2 mono text-xs mb-6"></div>
+        <div class="space-y-3 mt-4 pt-4 border-t border-bg-border">
+          <div class="skeleton h-3.5 w-3/4"></div>
+          <div class="skeleton h-3.5 w-full"></div>
+          <div class="skeleton h-3.5 w-5/6"></div>
+          <div class="skeleton h-3.5 w-1/2 mt-4"></div>
         </div>
       </div>
-      <div id="thinking-steps" class="space-y-2 mono text-xs"></div>
     </div>
 
     <!-- Content -->
     <div id="main-content" class="hidden">
 
       <!-- Narrative Briefing -->
-      <div class="card p-6 mb-5 anim border-l-2 border-l-accent-red">
+      <div class="card p-6 mb-5 anim anim-1 border-l-2 border-l-accent-red">
         <div class="flex items-center gap-2 mb-4">
           <div class="dot-red"></div>
           <span class="text-[10px] text-txt-muted uppercase tracking-widest">Advisor Briefing</span>
           <span class="badge-sm bg-accent-redGlow text-accent-red ml-auto">Autonomous</span>
         </div>
-        <div id="narrative" class="text-[13px] leading-[1.8] text-txt-secondary space-y-3"></div>
+        <div id="narrative" class="prose prose-invert prose-sm max-w-none text-txt-secondary leading-[1.8] space-y-3"></div>
       </div>
 
       <!-- Section: Dashboard -->
       <div id="section-dashboard" class="scroll-mt-4"></div>
       <div class="grid grid-cols-12 gap-5 mb-5">
-        <div class="col-span-4 card p-6 anim">
+        <div class="col-span-4 card p-6 anim anim-2">
           <span class="text-[10px] text-txt-muted uppercase tracking-widest">Today's P&L</span>
           <div id="pnl-value" class="text-3xl font-bold mono mt-2 mb-1"></div>
           <div id="pnl-pct" class="text-base font-semibold mono mb-4"></div>
@@ -465,7 +518,7 @@ body {
           </div>
         </div>
 
-        <div class="col-span-3 card p-6 anim flex flex-col items-center justify-center" style="animation-delay:0.05s">
+        <div class="col-span-3 card p-6 anim anim-3 flex flex-col items-center justify-center">
           <span class="text-[10px] text-txt-muted uppercase tracking-widest mb-3">Reasoning Quality</span>
           <div class="score-container">
             <svg viewBox="0 0 100 100"><circle class="score-bg" cx="50" cy="50" r="45"/><circle class="score-fg" cx="50" cy="50" r="45" id="score-circle"/></svg>
@@ -556,7 +609,7 @@ body {
 
     <!-- Footer -->
     <div class="text-center py-6 border-t border-bg-border">
-      <p class="text-[11px] text-txt-muted">Zero LLM calls &middot; Pure rule-based reasoning &middot; Sub-5ms latency &middot; Built for autonomous financial intelligence</p>
+      <p class="text-[11px] text-txt-muted">Hybrid AI &middot; Deterministic Causal Logic &middot; Dynamic LLM Generation &middot; Built for autonomous financial intelligence</p>
     </div>
   </div>
 </main>
@@ -608,6 +661,13 @@ function selectPortfolio(id, el) {
   loadPortfolio(id);
 }
 
+function reloadCurrentPortfolio() {
+  const active = document.querySelector('.port-card.active');
+  if (active) {
+    loadPortfolio(active.dataset.id);
+  }
+}
+
 async function loadPortfolio(id) {
   const thinkEl = document.getElementById('agent-thinking');
   const stepsEl = document.getElementById('thinking-steps');
@@ -627,7 +687,8 @@ async function loadPortfolio(id) {
   ];
 
   // Start fetch immediately
-  const fetchPromise = fetch('/api/portfolio/' + id).then(r => r.json());
+  const model = document.getElementById('model-select').value;
+  const fetchPromise = fetch('/api/portfolio/' + id + '?model=' + model).then(r => r.json());
 
   // Animate steps while waiting
   for (let i = 0; i < steps.length; i++) {
@@ -696,8 +757,7 @@ function renderBriefing(data) {
   // Narrative
   const narrativeEl = document.getElementById('narrative');
   if (b.narrative) {
-    const paras = b.narrative.split('\n\n');
-    narrativeEl.innerHTML = paras.map(p => '<p>' + p + '</p>').join('');
+    narrativeEl.innerHTML = marked.parse(b.narrative);
   } else {
     narrativeEl.innerHTML = '<p>' + b.key_takeaway + '</p>';
   }
