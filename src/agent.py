@@ -98,3 +98,112 @@ class FinancialAdvisorAgent:
                 "date": briefing.date,
                 "user": briefing.user_name,
                 "portfolio_type": briefing.portfolio_type,
+                "market_overview": briefing.market_overview,
+                "portfolio_pnl": briefing.portfolio_pnl,
+                "causal_chains": [
+                    {
+                        "trigger": c.trigger,
+                        "chain": c.chain,
+                        "impact": c.portfolio_impact,
+                        "confidence": c.confidence,
+                        "affected": c.affected_holdings,
+                    }
+                    for c in briefing.causal_chains
+                ],
+                "conflicts": [
+                    {
+                        "symbol": c.symbol,
+                        "positive": c.positive_signals,
+                        "negative": c.negative_signals,
+                        "resolution": c.resolution,
+                        "assessment": c.net_assessment,
+                    }
+                    for c in briefing.conflicts
+                ],
+                "risk_alerts": briefing.risk_alerts,
+                "key_takeaway": briefing.key_takeaway,
+                "confidence_score": briefing.confidence_score,
+                "narrative": narrative,
+            },
+            "evaluation": {
+                "overall_score": eval_report.overall_score,
+                "grade": eval_report.grade,
+                "dimensions": [
+                    {"name": s.dimension, "score": s.score, "reason": s.reason}
+                    for s in eval_report.scores
+                ],
+                "suggestions": eval_report.suggestions,
+            },
+            "trace": self.tracer.get_summary(),
+        }
+
+    def format_briefing_text(self, result: dict) -> str:
+        """Format result as human-readable briefing text."""
+        b = result["briefing"]
+        e = result["evaluation"]
+        t = result.get("trace", {})
+
+        lines = [
+            "=" * 70,
+            f"  FINANCIAL ADVISOR BRIEFING — {b['date']}",
+            f"  Portfolio: {b['user']} ({b['portfolio_type']})",
+            "=" * 70,
+            "",
+            "--- MARKET OVERVIEW ---",
+            b["market_overview"],
+            "",
+            "--- PORTFOLIO P&L ---",
+            b["portfolio_pnl"],
+            "",
+        ]
+
+        if b["causal_chains"]:
+            lines.append("--- CAUSAL ANALYSIS ---")
+            for i, chain in enumerate(b["causal_chains"], 1):
+                lines.append(f"\n  Chain {i} (confidence: {chain['confidence']:.0%}):")
+                for step in chain["chain"]:
+                    lines.append(f"    -> {step}")
+                lines.append(f"    => {chain['impact']}")
+                lines.append(f"    Affected: {', '.join(chain['affected'])}")
+            lines.append("")
+
+        if b["conflicts"]:
+            lines.append("--- CONFLICTING SIGNALS ---")
+            for c in b["conflicts"]:
+                lines.append(f"\n  {c['symbol']} [{c['assessment']}]:")
+                lines.append(f"    Resolution: {c['resolution']}")
+            lines.append("")
+
+        if b["risk_alerts"]:
+            lines.append("--- RISK ALERTS ---")
+            for alert in b["risk_alerts"]:
+                lines.append(f"  ⚠ {alert}")
+            lines.append("")
+
+        lines.extend([
+            "--- KEY TAKEAWAY ---",
+            b["key_takeaway"],
+            "",
+            "--- LLM ADVISORY NARRATIVE ---",
+            b.get("narrative", ""),
+            "",
+            f"--- REASONING QUALITY: {e['grade']} ({e['overall_score']:.0%}) ---",
+        ])
+        for dim in e["dimensions"]:
+            bar = "█" * int(dim["score"] * 10) + "░" * (10 - int(dim["score"] * 10))
+            lines.append(f"  {dim['name']:25s} {bar} {dim['score']:.0%}  {dim['reason']}")
+
+        if e["suggestions"]:
+            lines.append("\n  Improvement suggestions:")
+            for s in e["suggestions"]:
+                lines.append(f"    - {s}")
+
+        lines.extend([
+            "",
+            f"--- TRACE ---",
+            f"  Spans: {t.get('total_spans', 0)} | Duration: {t.get('total_duration_ms', 0):.0f}ms",
+            f"  Tokens: {t.get('token_usage', {}).get('total', 0)}",
+            "=" * 70,
+        ])
+
+        return "\n".join(lines)
