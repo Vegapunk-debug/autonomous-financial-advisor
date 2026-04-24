@@ -33,7 +33,7 @@ def setup_logging(verbose: bool = False) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Autonomous Financial Advisor Agent")
+    parser = argparse.ArgumentParser(description="AlphaReason AI: Autonomous Financial Advisor Agent")
     parser.add_argument(
         "--portfolio", "-p",
         help="Portfolio ID to analyze (e.g., PORTFOLIO_001). Omit for all.",

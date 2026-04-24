@@ -1,4 +1,4 @@
-# Autonomous Financial Advisor Agent
+# AlphaReason AI: Autonomous Financial Advisor Agent
 
 An intelligent agent that **reasons through market data** — not just reports it. It ingests live market signals, financial news, and user portfolios, then autonomously builds causal explanations of *why* your portfolio moved today.
 
