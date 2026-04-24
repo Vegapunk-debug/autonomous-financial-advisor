@@ -13,7 +13,7 @@ load_dotenv()
 
 from src.agent import FinancialAdvisorAgent
 
-app = FastAPI(title="Financial Advisor Agent")
+app = FastAPI(title="AlphaReason AI")
 
 BASE_DIR = Path(__file__).parent
 agent = FinancialAdvisorAgent(str(BASE_DIR / "data"))
@@ -25,9 +25,9 @@ async def dashboard():
 
 
 @app.get("/api/portfolio/{portfolio_id}")
-async def get_portfolio_analysis(portfolio_id: str):
+async def get_portfolio_analysis(portfolio_id: str, model: str = "llama-3.1-8b-instant"):
     try:
-        result = agent.run(portfolio_id)
+        result = agent.run(portfolio_id, model=model)
         return result
     except ValueError as e:
         return {"error": str(e)}

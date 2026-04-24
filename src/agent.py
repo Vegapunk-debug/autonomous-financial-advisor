@@ -20,7 +20,7 @@ class FinancialAdvisorAgent:
         self.tracer = Tracer()
         self.evaluator = BriefingEvaluator()
 
-    def run(self, portfolio_id: str) -> dict[str, Any]:
+    def run(self, portfolio_id: str, model: str = "llama-3.1-8b-instant") -> dict[str, Any]:
         """Execute full advisory pipeline for a portfolio. Returns structured result."""
         self.tracer.start_trace(
             f"advisory_{portfolio_id}",
@@ -70,7 +70,7 @@ class FinancialAdvisorAgent:
             with self.tracer.span("reasoning") as span:
                 engine = ReasoningEngine(intel, pa, self.tracer)
                 briefing = engine.generate_briefing()
-                narrative = engine.generate_narrative()
+                narrative = engine.generate_narrative(model=model)
                 span.output_data = {
                     "causal_chains": len(briefing.causal_chains),
                     "conflicts_resolved": len(briefing.conflicts),

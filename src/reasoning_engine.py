@@ -300,7 +300,7 @@ class ReasoningEngine:
 
         return " ".join(parts) if parts else "No significant signals detected today."
 
-    def generate_narrative(self) -> str:
+    def generate_narrative(self, model: str = "llama-3.1-8b-instant") -> str:
         """Generate a full natural-language advisory briefing using Groq LLM."""
         market_summary = self._intel.build_summary()
         portfolio = self._pa.analyze()
@@ -310,7 +310,8 @@ class ReasoningEngine:
         # Prepare context for LLM
         prompt = f"""
 You are an expert Autonomous Financial Advisor.
-Your job is to write a comprehensive natural-language advisory narrative.
+Your job is to write a comprehensive natural-language advisory narrative. 
+Use rich Markdown formatting (bullet points, bolding, blockquotes) for readability.
 
 Market Summary:
 {market_summary}
@@ -341,7 +342,7 @@ Do NOT just list the data. Reason through it like a human advisor. Focus on high
             
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model="llama-3.1-8b-instant",
+                model=model,
                 temperature=0.3,
             )
             narrative = response.choices[0].message.content.strip()
@@ -354,7 +355,7 @@ Do NOT just list the data. Reason through it like a human advisor. Focus on high
                 }
                 self.tracer.log_llm_call(
                     name="generate_narrative",
-                    model="llama-3.1-8b-instant",
+                    model=model,
                     prompt=prompt,
                     response=narrative,
                     tokens=usage
