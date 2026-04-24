@@ -9,17 +9,30 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
+  <!-- Suppress Tailwind CDN production warning -->
   <script>
-    // Fallback for local development if static CSS isn't built yet
-    fetch('/static/css/tailwind.css').then(r => {
-      if (!r.ok) {
-        console.warn('Production CSS not found. Falling back to Play CDN...');
-        const s = document.createElement('script');
-        s.src = 'https://cdn.tailwindcss.com';
-        document.head.appendChild(s);
-      }
-    });
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+      if (typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) return;
+      originalWarn.apply(console, args);
+    };
   </script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { background-color: #000000; color: #ffffff; }
+    /* Fix for white dropdown in some browsers */
+    #model-select {
+      background-color: #050505 !important;
+      color: #ffffff !important;
+      color-scheme: dark;
+    }
+    #model-select option {
+      background-color: #050505 !important;
+      color: #ffffff !important;
+    }
+  </style>
   <script>
     tailwind.config = {
       theme: {
