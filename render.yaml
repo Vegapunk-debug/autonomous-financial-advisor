@@ -2,7 +2,7 @@ services:
   - type: web
     name: alphareason-ai
     env: python
-    buildCommand: npm install && npx tailwindcss -o static/css/tailwind.css --minify && pip install -r requirements.txt
+    buildCommand: mkdir -p static/css && npm install && npx tailwindcss -o static/css/tailwind.css --minify && pip install -r requirements.txt
     startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY

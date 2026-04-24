@@ -59,10 +59,14 @@ class Tracer:
 
     def start_trace(self, name: str, metadata: dict | None = None) -> None:
         if self._langfuse:
-            self._trace = self._langfuse.trace(
-                name=name,
-                metadata=metadata or {},
-            )
+            try:
+                self._trace = self._langfuse.trace(
+                    name=name,
+                    metadata=metadata or {},
+                )
+            except Exception as e:
+                logger.warning(f"Failed to start Langfuse trace: {e}")
+                self._trace = None
         logger.info(f"Trace started: {name}")
 
     @contextmanager
@@ -105,13 +109,16 @@ class Tracer:
         self._total_tokens["total"] += usage.get("total", 0)
 
         if self._langfuse and self._trace:
-            self._trace.generation(
-                name=name,
-                model=model,
-                input=prompt,
-                output=response,
-                usage=usage,
-            )
+            try:
+                self._trace.generation(
+                    name=name,
+                    model=model,
+                    input=prompt,
+                    output=response,
+                    usage=usage,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log LLM generation to Langfuse: {e}")
 
         logger.info(
             f"LLM call [{name}] model={model} | "
