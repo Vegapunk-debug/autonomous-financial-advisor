@@ -16,9 +16,9 @@ tailwind.config = {
       colors: {
         bg: { primary: '#050505', secondary: '#0a0a0a', card: '#0f0f0f', hover: '#151515', border: '#1c1c1c' },
         accent: { 
-          primary: '#10b981', 
-          primaryLight: '#34d399', 
-          primaryGlow: 'rgba(16, 185, 129, 0.15)',
+          primary: 'var(--accent-primary)', 
+          primaryLight: 'var(--accent-primary-light)', 
+          primaryGlow: 'var(--accent-primary-glow)',
           gold: '#f59e0b',
           red: '#ef4444'
         },
@@ -29,11 +29,16 @@ tailwind.config = {
 }
 </script>
 <style>
+:root {
+  --accent-primary: #10b981;
+  --accent-primary-light: #34d399;
+  --accent-primary-glow: rgba(16, 185, 129, 0.15);
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Inter', -apple-system, sans-serif;
-  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.05), transparent 45%),
+  background: radial-gradient(circle at 10% 20%, var(--accent-primary-glow), transparent 45%),
               radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.04), transparent 45%),
               radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0.5), transparent 60%),
               #050505;
@@ -625,14 +630,36 @@ const fmt = (n) => new Intl.NumberFormat('en-IN').format(Math.round(n));
 const fmtCr = (n) => '\u20B9' + fmt(n);
 let sectorChart = null;
 
+let globalPortfolios = {};
+
 async function init() {
   const [portfolios, market] = await Promise.all([
     fetch('/api/portfolios').then(r => r.json()),
     fetch('/api/market').then(r => r.json()),
   ]);
+  globalPortfolios = portfolios;
   renderTicker(market);
   renderPortfolioCards(portfolios);
   await loadPortfolio('PORTFOLIO_001');
+}
+
+function updateAccentColor(risk) {
+  const root = document.documentElement;
+  const r = risk.toUpperCase();
+  if (r === 'AGGRESSIVE') {
+    root.style.setProperty('--accent-primary', '#ef4444');
+    root.style.setProperty('--accent-primary-light', '#f87171');
+    root.style.setProperty('--accent-primary-glow', 'rgba(239, 68, 68, 0.15)');
+  } else if (r === 'MODERATE') {
+    root.style.setProperty('--accent-primary', '#10b981');
+    root.style.setProperty('--accent-primary-light', '#34d399');
+    root.style.setProperty('--accent-primary-glow', 'rgba(16, 185, 129, 0.15)');
+  } else {
+    // CONSERVATIVE
+    root.style.setProperty('--accent-primary', '#0ea5e9');
+    root.style.setProperty('--accent-primary-light', '#38bdf8');
+    root.style.setProperty('--accent-primary-glow', 'rgba(14, 165, 233, 0.15)');
+  }
 }
 
 function renderTicker(market) {
@@ -675,6 +702,9 @@ function reloadCurrentPortfolio() {
 }
 
 async function loadPortfolio(id) {
+  const p = globalPortfolios[id];
+  if (p) updateAccentColor(p.risk_profile);
+  
   const thinkEl = document.getElementById('agent-thinking');
   const stepsEl = document.getElementById('thinking-steps');
   const mainEl = document.getElementById('main-content');
