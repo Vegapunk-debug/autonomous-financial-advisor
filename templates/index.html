@@ -4,14 +4,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlphaReason AI — Autonomous Financial Advisor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <title>AlphaReason AI | Autonomous Financial Advisor</title>
+  <link href="/static/css/tailwind.css" rel="stylesheet">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
+  <script>
+    // Fallback for local development if static CSS isn't built yet
+    fetch('/static/css/tailwind.css').then(r => {
+      if (!r.ok) {
+        console.warn('Production CSS not found. Falling back to Play CDN...');
+        const s = document.createElement('script');
+        s.src = 'https://cdn.tailwindcss.com';
+        document.head.appendChild(s);
+      }
+    });
+  </script>
   <script>
     tailwind.config = {
       theme: {
@@ -882,13 +890,24 @@
     }
 
     function renderPortfolioCards(portfolios) {
+      if (!portfolios) return;
       ['PORTFOLIO_001', 'PORTFOLIO_002', 'PORTFOLIO_003'].forEach((id, i) => {
-        const p = portfolios[id]; if (!p) return;
+        const p = portfolios[id];
         const n = i + 1;
-        document.getElementById('p' + n + '-name').textContent = p.user_name;
-        document.getElementById('p' + n + '-desc').textContent = (p.description || '').substring(0, 45) + '...';
-        document.getElementById('p' + n + '-value').textContent = fmtCr(p.current_value);
-        document.getElementById('p' + n + '-risk').textContent = p.risk_profile;
+        if (!p) {
+          console.warn(`Portfolio ${id} not found in response`);
+          return;
+        }
+        
+        const nameEl = document.getElementById('p' + n + '-name');
+        const descEl = document.getElementById('p' + n + '-desc');
+        const valEl = document.getElementById('p' + n + '-value');
+        const riskEl = document.getElementById('p' + n + '-risk');
+
+        if (nameEl) nameEl.textContent = p.user_name || 'Anonymous';
+        if (descEl) descEl.textContent = (p.description || '').substring(0, 45) + (p.description?.length > 45 ? '...' : '');
+        if (valEl) valEl.textContent = fmtCr(p.current_value || 0);
+        if (riskEl) riskEl.textContent = p.risk_profile || 'MODERATE';
       });
     }
 

@@ -15,6 +15,8 @@ from src.agent import FinancialAdvisorAgent
 
 app = FastAPI(title="AlphaReason AI")
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 BASE_DIR = Path(__file__).parent
 agent = FinancialAdvisorAgent(str(BASE_DIR / "data"))
 
@@ -36,6 +38,7 @@ async def get_portfolio_analysis(portfolio_id: str, model: str = "llama-3.1-8b-i
 @app.get("/api/portfolios")
 async def list_portfolios():
     portfolios = agent.loader.get_portfolios()
+    print(f"DEBUG: Loaded {len(portfolios)} portfolios: {list(portfolios.keys())}")
     return {
         pid: {
             "user_name": p.get("user_name", ""),
