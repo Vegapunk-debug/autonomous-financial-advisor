@@ -73,36 +73,36 @@ That's exactly what this agent does — automatically, in under 5 milliseconds.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        User Interface                        │
+│                        User Interface                       │
 │  ┌──────────────┐  ┌─────────────────────────────────────┐  │
-│  │   Sidebar     │  │  Dashboard (FastAPI + HTML/JS)      │  │
-│  │  - Dashboard  │  │  - Market Ticker                    │  │
-│  │  - Analysis   │  │  - Portfolio Cards                  │  │
-│  │  - Reasoning  │  │  - Agent Thinking Animation         │  │
-│  │  - Trace      │  │  - Natural Language Briefing        │  │
-│  └──────────────┘  │  - Causal Chain Visualizer           │  │
-│                     │  - Risk Alerts & Conflicts           │  │
-│                     │  - Self-Evaluation Scores            │  │
-│                     │  - Sector Performance Chart          │  │
-│                     │  - Pipeline Trace Panel              │  │
-│                     └─────────────────────────────────────┘  │
-└───────────────────────────┬──────────────────────────────────┘
+│  │   Sidebar    │  │   Dashboard (FastAPI + HTML/JS)     │  │
+│  │  - Dashboard │  │   - Market Ticker                   │  │
+│  │  - Analysis  │  │   - Portfolio Cards                 │  │
+│  │  - Reasoning │  │   - Agent Thinking Animation        │  │
+│  │  - Trace     │  │   - Natural Language Briefing       │  │
+│  └──────────────┘  │   - Causal Chain Visualizer         │  │
+│                    │   - Risk Alerts & Conflicts         │  │
+│                    │   - Self-Evaluation Scores          │  │
+│                    │   - Sector Performance Chart        │  │
+│                    │   - Pipeline Trace Panel            │  │
+│                    └─────────────────────────────────────┘  │
+└───────────────────────────┬─────────────────────────────────┘
                             │ API calls
                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   FastAPI Server (server.py)                  │
+┌──────────────────────────────────────────────────────────────┐
+│                   FastAPI Server (server.py)                 │
 │                                                              │
 │  GET /                    → Serves dashboard HTML            │
 │  GET /api/portfolios      → Lists all 3 portfolios           │
 │  GET /api/market          → Returns market + historical data │
-│  GET /api/portfolio/{id}  → Runs full agent pipeline ───┐    │
-│                                                          │    │
-└──────────────────────────────────────────────────────────┼────┘
+│  GET /api/portfolio/{id}  → Runs full agent pipeline ────┐   │
+│                                                          │   │
+└──────────────────────────────────────────────────────────┼───┘
                                                            │
                     ┌──────────────────────────────────────┘
                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│              FinancialAdvisorAgent (agent.py)                 │
+┌──────────────────────────────────────────────────────────────┐
+│              FinancialAdvisorAgent (agent.py)                │
 │                     ORCHESTRATOR                             │
 │                                                              │
 │  Phase 1: data_loader.py      → Load 6 JSON files            │
@@ -112,18 +112,18 @@ That's exactly what this agent does — automatically, in under 5 milliseconds.
 │  Phase 5: evaluator.py       → Self-grade reasoning quality  │
 │                                                              │
 │  Wrapped in: observability.py → Tracing every step           │
-└─────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────┘
                     │
                     ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    Data Layer (/data/)                        │
-│                                                              │
-│  market_data.json     → 40 stocks, 5 indices, 10 sectors     │
-│  news_data.json       → 25 articles with sentiment tags      │
-│  portfolios.json      → 3 user portfolios                    │
-│  mutual_funds.json    → 12 mutual fund schemes               │
-│  historical_data.json → 7-day trends, FII/DII flows          │
-│  sector_mapping.json  → Stock-sector relationships           │
+│                    Data Layer (/data/)                      │
+│                                                             │
+│  market_data.json     → 40 stocks, 5 indices, 10 sectors    │
+│  news_data.json       → 25 articles with sentiment tags     │
+│  portfolios.json      → 3 user portfolios                   │
+│  mutual_funds.json    → 12 mutual fund schemes              │
+│  historical_data.json → 7-day trends, FII/DII flows         │
+│  sector_mapping.json  → Stock-sector relationships          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
