@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import json
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -25,7 +26,7 @@ class EvalReport:
 class BriefingEvaluator:
     """Evaluates quality of generated briefings using rule-based checks and optional LLM grading."""
 
-    def evaluate(self, briefing: Any, portfolio_data: dict, market_data: dict) -> EvalReport:
+    def evaluate(self, briefing: Any, portfolio_data: dict, market_data: dict, narrative: str = "") -> EvalReport:
         scores: list[EvalScore] = []
 
         scores.append(self._eval_causal_depth(briefing))
@@ -36,8 +37,8 @@ class BriefingEvaluator:
         scores.append(self._eval_conciseness(briefing))
         
         # Phase 4 extension: LLM-based reasoning quality
-        if hasattr(briefing, 'narrative') and briefing.narrative:
-            scores.append(self._eval_llm_reasoning_quality(briefing.narrative, market_data))
+        if narrative:
+            scores.append(self._eval_llm_reasoning_quality(narrative, market_data))
 
         # Weighted average
         total_weight = sum(s.weight for s in scores)

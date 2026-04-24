@@ -80,7 +80,7 @@ class FinancialAdvisorAgent:
             # Phase 5: Self-Evaluation
             with self.tracer.span("evaluation") as span:
                 news_for_eval = {"news": news_data}
-                eval_report = self.evaluator.evaluate(briefing, portfolio, news_for_eval)
+                eval_report = self.evaluator.evaluate(briefing, portfolio, news_for_eval, narrative=narrative)
                 span.output_data = {
                     "overall_score": eval_report.overall_score,
                     "grade": eval_report.grade,
