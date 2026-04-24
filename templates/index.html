@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinAdvisor AI — Autonomous Financial Advisor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        bg: { primary: '#07080d', secondary: '#0c0d14', card: '#10111a', hover: '#14151f', border: '#1a1b27' },
+        accent: { red: '#c0392b', redLight: '#e74c3c', redGlow: 'rgba(192,57,43,0.15)' },
+        txt: { primary: '#e8e8ec', secondary: '#8b8b9e', muted: '#55556a' }
+      }
+    }
+  }
+}
+</script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #07080d;
+  color: #e8e8ec;
+  min-height: 100vh;
+  display: flex;
+}
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Sidebar */
+.sidebar {
+  width: 72px;
+  min-height: 100vh;
+  background: #0a0b12;
+  border-right: 1px solid #1a1b27;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+}
+.sidebar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #55556a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  position: relative;
+}
+.sidebar-icon:hover, .sidebar-icon.active {
+  background: #14151f;
+  color: #e8e8ec;
+}
+.sidebar-icon.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: #c0392b;
+  border-radius: 0 3px 3px 0;
+}
+.sidebar-label {
+  font-size: 9px;
+  color: #55556a;
+  margin-top: 2px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* Main content */
+.main { margin-left: 72px; flex: 1; min-height: 100vh; }
+
+/* Cards */
+.card {
+  background: #10111a;
+  border: 1px solid #1a1b27;
+  border-radius: 14px;
+  transition: border-color 0.2s ease;
+}
+.card:hover { border-color: #252638; }
+.card-flat {
+  background: transparent;
+  border: 1px solid #1a1b27;
+  border-radius: 14px;
+}
+
+/* Portfolio selector */
+.port-card {
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+.port-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: transparent;
+  border-radius: 14px 14px 0 0;
+  transition: background 0.25s ease;
+}
+.port-card.active::before { background: #c0392b; }
+.port-card.active { border-color: #2a1a1a; background: #110e12; }
+
+/* Red dot accent */
+.dot-red {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c0392b;
+  box-shadow: 0 0 12px rgba(192,57,43,0.4);
+  flex-shrink: 0;
+}
+
+/* Divider */
+.divider { height: 1px; background: #1a1b27; }
+
+/* Chain */
+.chain-track {
+  position: relative;
+  padding-left: 28px;
+}
+.chain-track::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg, #c0392b 0%, #2a1a27 100%);
+}
+.chain-step {
+  position: relative;
+  padding: 10px 0;
+  animation: chainIn 0.35s ease-out both;
+}
+.chain-step::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 16px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid #c0392b;
+  background: #07080d;
+}
+.chain-step:first-child::before { background: #c0392b; }
+.chain-step:last-child::before { background: #c0392b; }
+
+@keyframes chainIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim { animation: fadeIn 0.4s ease-out both; }
+
+/* Score arc */
+.score-container {
+  width: 100px; height: 100px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.score-container svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.score-container circle { fill: none; stroke-linecap: round; }
+.score-bg { stroke: #1a1b27; stroke-width: 3; }
+.score-fg { stroke-width: 3; stroke-dasharray: 283; transition: stroke-dashoffset 1.2s ease-out; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1a1b27; border-radius: 2px; }
+
+/* Tab */
+.tab-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #55556a;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.tab-btn:hover { color: #8b8b9e; }
+.tab-btn.active { color: #e8e8ec; background: #14151f; border-color: #1a1b27; }
+
+/* Bar */
+.bar-track { height: 4px; background: #1a1b27; border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease-out; }
+
+.badge-sm {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.loader {
+  width: 28px; height: 28px;
+  border: 2px solid #1a1b27;
+  border-top-color: #c0392b;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="mb-8">
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
+      <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+    </div>
+  </div>
+
+  <div class="sidebar-icon active" title="Dashboard" data-section="dashboard">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zm0 6a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1v-5zM4 13a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z"/></svg>
+  </div>
+  <span class="sidebar-label mb-3">Dashboard</span>
+
+  <div class="sidebar-icon" title="Analysis" data-section="analysis">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+  </div>
+  <span class="sidebar-label mb-3">Analysis</span>
+
+  <div class="sidebar-icon" title="Reasoning" data-section="reasoning">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+  </div>
+  <span class="sidebar-label mb-3">Reasoning</span>
+
+  <div class="sidebar-icon" title="Trace" data-section="trace">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+  </div>
+  <span class="sidebar-label mb-3">Trace</span>
+
+  <div class="flex-1"></div>
+
+  <div class="sidebar-icon" title="About" onclick="toggleAbout()">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  </div>
+  <span class="sidebar-label">About</span>
+</nav>
+
+<!-- About Modal -->
+<div id="about-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleAbout()"></div>
+  <div class="relative card p-8 max-w-xl w-full mx-4 border-t-2 border-t-accent-red" style="animation: fadeIn 0.3s ease-out">
+    <button onclick="toggleAbout()" class="absolute top-4 right-4 text-txt-muted hover:text-txt-primary transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-900/40 to-red-800/20 flex items-center justify-center">
+        <svg class="w-5 h-5 text-accent-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold">FinAdvisor<span class="text-accent-red">AI</span></h2>
+        <p class="text-[11px] text-txt-muted tracking-widest uppercase">Autonomous Reasoning Engine</p>
+      </div>
+    </div>
+
+    <p class="text-[13px] text-txt-secondary leading-relaxed mb-4">
+      An autonomous financial advisor agent that <strong class="text-txt-primary">reasons through market data</strong> — not just reports it. It ingests market signals, financial news, and user portfolios, then builds causal explanations of why your portfolio moved.
+    </p>
+
+    <div class="divider mb-4"></div>
+
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <span class="text-[10px] text-txt-muted uppercase tracking-widest">Architecture</span>
+        <p class="text-xs text-txt-secondary mt-1">5-phase pipeline: Data Ingestion &rarr; Market Intelligence &rarr; Portfolio Analytics &rarr; Causal Reasoning &rarr; Self-Evaluation</p>
+      </div>
+      <div>
+        <span class="text-[10px] text-txt-muted uppercase tracking-widest">LLM Usage</span>
